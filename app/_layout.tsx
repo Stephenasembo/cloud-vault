@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
 
-export const isLoggedIn = false;
+export const isLoggedIn = true;
 
 export default function RootNavigation() {
   return (
@@ -9,7 +9,7 @@ export default function RootNavigation() {
         <Stack.Screen name='(auth)' options={{ headerShown: false}}/>
       </Stack.Protected>
       <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name='(protected)'/>
+        <Stack.Screen name='(protected)' options={{ title: 'Cloud Vault'}}/>
       </Stack.Protected>
 
     </Stack>
