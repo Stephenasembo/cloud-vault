@@ -1,26 +1,31 @@
-import { View, Text, StyleSheet, ImageBackground, Pressable } from "react-native" 
+import { Link, useRouter } from "expo-router"
+import { View, Text, StyleSheet, ImageBackground, Pressable } from "react-native"
 
 export default function Home() {
+  const navigation = useRouter();
+
   return (
     <View style={styles.container}>
       <ImageBackground
-      source={require('../assets/background.jpg')}
+      source={require('../../assets/background.jpg')}
       style={styles.backgroundImage}
       >
         <View style={styles.textContainer}>
           <Text style={styles.backgroundText}>Splash screen</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <Pressable
+          <Link
           style={styles.button}
+          href='/signup'
           >
             <Text style={styles.buttonText}>Sign Up</Text>
-          </Pressable>
-          <Pressable
+          </Link>
+          <Link
           style={styles.button}
+          href='/login'
           >
             <Text style={styles.buttonText}>Login</Text>
-          </Pressable>
+          </Link>
         </View>
       </ImageBackground>
     </View>
@@ -39,7 +44,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     flex: 1,
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   backgroundText: {
     color: 'white',

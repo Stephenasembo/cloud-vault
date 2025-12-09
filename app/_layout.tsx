@@ -1,11 +1,17 @@
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router'
 
-export default function RootTabNavigator() {
+export const isLoggedIn = false;
+
+export default function RootNavigation() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }}/>
-      <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }}/>
-      <Tabs.Screen name="splash" options={{ tabBarLabel: "Splash" }}/>
-    </Tabs>
+    <Stack>
+      <Stack.Protected guard={!isLoggedIn}>
+        <Stack.Screen name='(auth)'/>
+      </Stack.Protected>
+      <Stack.Protected guard={isLoggedIn}>
+        <Stack.Screen name='(protected)'/>
+      </Stack.Protected>
+
+    </Stack>
   )
 }
