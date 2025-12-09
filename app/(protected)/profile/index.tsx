@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image } from "react-native" 
+import { View, Text, StyleSheet, Image, Button } from "react-native" 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ProfileLink from "../../components/ProfileLink";
+import ProfileLink from "../../../components/ProfileLink";
+import { Link } from "expo-router";
 
 export default function Profile() {
   return (
@@ -8,7 +9,7 @@ export default function Profile() {
       <SafeAreaView style={styles.container}>
         <View style={styles.information}>
           <Image
-          source={require('../../assets/avatar.png')}
+          source={require('../../../assets/avatar.png')}
           style={styles.avatar}
           />
           <Text style={styles.avatarText}>John Doe</Text>
@@ -16,15 +17,18 @@ export default function Profile() {
         <View style={styles.linksContainer}>
           <ProfileLink
           text='Terms & Conditions'
+          destination='/profile/terms'
           />
           <ProfileLink
           text='FAQ & Help'
+          destination='/profile/faq'
           />
           <ProfileLink
           text='Settings'
+          destination='/profile/settings'
           />
-          <ProfileLink
-          text='Logout'
+          <Button
+          title='Logout'
           />
         </View>
       </SafeAreaView>

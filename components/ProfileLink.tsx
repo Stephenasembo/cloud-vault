@@ -1,14 +1,21 @@
 import { View, Text, StyleSheet } from "react-native"
+import { Link } from 'expo-router'
 
 type ProfileLinkProps = {
-  text: string
+  text: string;
+  destination: string;
 }
 
-export default function ProfileLink({ text }: ProfileLinkProps) {
+export default function ProfileLink({ text, destination }: ProfileLinkProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.linkText}>{text}</Text>
-    </View>
+    <Link
+    style={styles.container}
+    href={destination}
+    >
+      <View>
+        <Text style={styles.linkText}>{text}</Text>
+      </View>
+    </Link>
   )
 }
 
