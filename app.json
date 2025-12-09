@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "scheme": "your-app-scheme",
     "ios": {
       "supportsTablet": true
     },

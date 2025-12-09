@@ -5,6 +5,7 @@ export default function RootTabNavigator() {
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }}/>
       <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }}/>
+      <Tabs.Screen name="splash" options={{ tabBarLabel: "Splash" }}/>
     </Tabs>
   )
 }
