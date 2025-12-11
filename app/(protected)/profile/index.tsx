@@ -1,9 +1,16 @@
-import { View, Text, StyleSheet, Image, Button } from "react-native" 
+import { View, Text, StyleSheet, Image, Button, Alert } from "react-native" 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ProfileLink from "../../../components/ProfileLink";
 import { Link } from "expo-router";
+import { supabase } from "../../../lib/supabase";
 
 export default function Profile() {
+  async function logoutUser() {
+    const { error } = await supabase.auth.signOut()
+    if (error) console.log(`Error on signing out: ${error}`)
+      console.log('User signing out...')
+  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -29,6 +36,7 @@ export default function Profile() {
           />
           <Button
           title='Logout'
+          onPress={logoutUser}
           />
         </View>
       </SafeAreaView>
