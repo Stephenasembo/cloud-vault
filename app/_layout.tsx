@@ -1,17 +1,26 @@
 import { Stack } from 'expo-router'
+import AuthProvider from '../providers/AuthProvider';
+import { useAuthContext } from '../context/AuthContext';
 
-export const isLoggedIn = false;
+function RootNavigation() {
+  const {isLoggedIn} = useAuthContext();
 
-export default function RootNavigation() {
   return (
     <Stack>
       <Stack.Protected guard={!isLoggedIn}>
         <Stack.Screen name='(auth)' options={{ headerShown: false}}/>
       </Stack.Protected>
-      <Stack.Protected guard={isLoggedIn}>
+      <Stack.Protected guard={!!isLoggedIn}>
         <Stack.Screen name='(protected)' options={{ title: 'Cloud Vault'}}/>
       </Stack.Protected>
-
     </Stack>
+  )
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigation />
+    </AuthProvider>
   )
 }

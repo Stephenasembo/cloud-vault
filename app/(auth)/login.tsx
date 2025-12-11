@@ -1,17 +1,35 @@
 import { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../../lib/supabase";
+import { useAuthContext } from "../../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit() {
-    Alert.alert(
-      'User details sent',
-      `Email: ${email}\nPassword: ${password}`
-    )
+  async function loginUser() {
+    try{
+      setLoading(true);
+      const {
+        data: { session },
+        error
+      } = await supabase.auth.signInWithPassword({
+        email, password
+      })
+
+      if (error) console.log(error.message)
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async function handleSubmit() {
+    setLoading(true);
+    await loginUser();
+    setLoading(false);
   }
 
   return (
@@ -49,7 +67,7 @@ export default function Login() {
             style={styles.button}
             onPress={handleSubmit}
             >
-              <Text style={styles.buttonText}>Create Account</Text>
+              <Text style={styles.buttonText}>Login</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -112,5 +130,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 })

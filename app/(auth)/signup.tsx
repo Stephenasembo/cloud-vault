@@ -1,17 +1,35 @@
 import { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../../lib/supabase";
 
-export default function Login() {
+export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit() {
-    Alert.alert(
-      'User details sent',
-      `Email: ${email}\nPassword: ${password}`
-    )
+  async function signUpUser() {
+    try{
+      setLoading(true);
+      const {
+        data: { session },
+        error
+      } = await supabase.auth.signUp({
+        email, password
+      })
+
+      if (error) console.log(error.message)
+      if (!session) Alert.alert('Please check your inbox for email verification!')
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async function handleSubmit() {
+    setLoading(true);
+    await signUpUser();
+    setLoading(false);
   }
 
   return (
