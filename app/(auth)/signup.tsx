@@ -1,7 +1,19 @@
-import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform } from "react-native";
+import { useState } from "react";
+import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  function handleSubmit() {
+    Alert.alert(
+      'User details sent',
+      `Email: ${email}\nPassword: ${password}`
+    )
+  }
+
   return (
     <SafeAreaProvider>
       <KeyboardAvoidingView
@@ -15,11 +27,12 @@ export default function Login() {
           </View>
           <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Username</Text>
+                <Text style={styles.label}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="John Doe"
+                  placeholder="johndoe@gmail.com"
                   placeholderTextColor="#A0A0A0"
+                  onChangeText={(e) => setEmail(e)}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -29,9 +42,13 @@ export default function Login() {
                   placeholder="Enter your password"
                   placeholderTextColor="#A0A0A0"
                   secureTextEntry
+                  onChangeText={(e) => setPassword(e)}
                 />
             </View>
-            <Pressable style={styles.button}>
+            <Pressable
+            style={styles.button}
+            onPress={handleSubmit}
+            >
               <Text style={styles.buttonText}>Create Account</Text>
             </Pressable>
           </View>

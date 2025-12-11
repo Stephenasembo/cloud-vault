@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
 
-export const isLoggedIn = true;
+export const isLoggedIn = false;
 
 export default function RootNavigation() {
   return (
