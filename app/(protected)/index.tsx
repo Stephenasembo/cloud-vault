@@ -1,15 +1,19 @@
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native" 
+import { createFolder } from "../../services/folder";
+import { useAuthContext } from "../../context/AuthContext";
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
+  const { userId } = useAuthContext();
 
-  function handleFolderName() {
-    setModalVisible(false)
+  async function handleFolderName() {
+    setModalVisible(false);
+    await createFolder(folderName, userId);
     Alert.alert(
-      'Text Change Reflection',
-      `The new folder name is: ${folderName}`
+      'Testing supabase functions',
+      `New folder created`
     )
   }
 
