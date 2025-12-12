@@ -1,12 +1,16 @@
 import { useState } from "react"
-import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native" 
+import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from "react-native" 
 import { createFolder } from "../../services/folder";
 import { useAuthContext } from "../../context/AuthContext";
+import FolderCard from "../../components/Folder";
+import { useFoldersContext } from "../../context/FoldersContext";
+import { Folder } from "../../types/folder";
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
   const { userId } = useAuthContext();
+  const { userFolders } = useFoldersContext();
 
   async function handleFolderName() {
     setModalVisible(false);
@@ -20,6 +24,18 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text>Welcome to CloudVault</Text>
+      <View style={styles.folderContainer}>
+        <FlatList
+        contentContainerStyle={styles.listContent}
+        data={userFolders}
+        keyExtractor={(item: Folder) => item.id}
+        renderItem={({item}) => (
+          <FolderCard
+          folderName={item.name}
+          />
+        )}
+        />
+      </View>
       <Pressable
       style={styles.addButton}
       onPress={() => setModalVisible(true)}
@@ -78,6 +94,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+
+  folderContainer: {
+    width: '100%',
+    marginVertical: 16,
+  },
+
+  listContent: {
+    paddingHorizontal: 16,
   },
 
   addButton: {
