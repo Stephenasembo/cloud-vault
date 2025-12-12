@@ -1,10 +1,19 @@
 import { Tabs } from 'expo-router';
+import FoldersProvider from '../../providers/FoldersProvider';
 
-export default function RootTabNavigator() {
+function RootTabNavigation() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }}/>
       <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }}/>
     </Tabs>
+  )
+}
+
+export default function RootTabLayout() {
+  return (
+    <FoldersProvider>
+      <RootTabNavigation />
+    </FoldersProvider>
   )
 }
