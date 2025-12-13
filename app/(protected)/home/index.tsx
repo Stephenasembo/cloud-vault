@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from "react-native" 
-import { createFolder } from "../../services/folder";
-import { useAuthContext } from "../../context/AuthContext";
-import FolderCard from "../../components/FolderCard";
-import { useFoldersContext } from "../../context/FoldersContext";
-import { Folder } from "../../types/folder";
-import FolderModal from "../../components/FolderModal";
+import { createFolder } from "../../../services/folder";
+import { useAuthContext } from "../../../context/AuthContext";
+import FolderCard from "../../../components/FolderCard";
+import { useFoldersContext } from "../../../context/FoldersContext";
+import { Folder } from "../../../types/folder";
+import FolderModal from "../../../components/FolderModal";
 import { useRouter } from "expo-router";
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
   }
 
   function openFolder(id: string) {
-    router.navigate(`/folder/${id}`)
+    router.navigate(`/home/folder/${id}`)
   }
 
   return (

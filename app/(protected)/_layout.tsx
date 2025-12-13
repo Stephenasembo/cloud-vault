@@ -4,7 +4,7 @@ import FoldersProvider from '../../providers/FoldersProvider';
 function RootTabNavigation() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }}/>
+      <Tabs.Screen name="home" options={{ tabBarLabel: "Home" }}/>
       <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }}/>
     </Tabs>
   )
