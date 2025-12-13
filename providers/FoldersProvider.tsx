@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import { Folder } from "../types/folder";
-import { getFolders } from "../services/folder";
+import { getFolders, updateFolder } from "../services/folder";
 import { useAuthContext } from "../context/AuthContext";
 import {FoldersContext} from "../context/FoldersContext";
 import { createFolder, deleteFolder } from "../services/folder";
@@ -43,13 +43,22 @@ export default function FoldersProvider({children} : PropsWithChildren) {
     return "Folder deleted successfully"
   }
 
+  async function editUserFolder(newName: string, folderId: string): Promise<string> {
+    const data = await updateFolder(newName, folderId)
+    if(!data) {
+      return "Failed to update folder name"
+    }
+    await refreshFolders()
+    return "Folder name updated successfully"
+  }
+
   console.log("Fetsched folders:", userFolders)
   useEffect(() => {
     refreshFolders()
   }, [userId])
 
   return (
-    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder }}>
+    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder, editUserFolder }}>
       {children}
     </FoldersContext>
   )

@@ -2,9 +2,10 @@ import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from "react-native" 
 import { createFolder } from "../../services/folder";
 import { useAuthContext } from "../../context/AuthContext";
-import FolderCard from "../../components/Folder";
+import FolderCard from "../../components/FolderCard";
 import { useFoldersContext } from "../../context/FoldersContext";
 import { Folder } from "../../types/folder";
+import FolderModal from "../../components/FolderModal";
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,47 +44,13 @@ export default function Home() {
         <Text style={styles.addButtonText}>+</Text>
       </Pressable>
       <View>
-        <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-        >
-          <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-          >
-            <Pressable
-            onPress={() => setModalVisible(false)}
-            style={styles.backdrop}
-            />
-            <View style={styles.modalCard}>
-              <View>
-                <Text  style={styles.modalTitle}>Create new folder</Text>
-                <TextInput
-                placeholder="Enter folder name"
-                style={styles.input}
-                autoFocus
-                onChangeText={(e) => setFolderName(e)}
-                />
-              </View>
-              <View style={styles.modalButtons}>
-                <Pressable
-                onPress={() => setModalVisible(false)}
-                style={styles.modalButton}
-                >
-                  <Text>Cancel</Text>
-                </Pressable>
-                <Pressable
-                onPress={handleFolderName}
-                style={styles.modalButton}
-                >
-                  <Text>Save</Text>
-                </Pressable>
-              </View>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
+        <FolderModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        setFolderName={setFolderName}
+        handleFolderName={handleFolderName}
+        modalTitle="Create new folder"
+        />
       </View>
     </View>
   )
@@ -122,57 +89,9 @@ const styles = StyleSheet.create({
     color: 'white'
   },
 
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'flex-end',
-  },
-
-  modalButton: {
-    borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 16,
-  },
-
   button: {
     borderWidth: 1,
     borderRadius: 10,
     padding: 8,
   },
-
-  modalOverlay: {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-  },
-
-  modalCard: {
-  width: "85%",
-  backgroundColor: "white",
-  padding: 20,
-  borderRadius: 16,
-  elevation: 5,
-  },
-
-  modalTitle: {
-  fontSize: 18,
-  fontWeight: "600",
-  marginBottom: 16,
-  textAlign: 'center',
-  },
-
-  input: {
-  borderWidth: 1,
-  borderColor: "#ccc",
-  borderRadius: 8,
-  padding: 10,
-  marginBottom: 16,
-  },
-
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)'
-  }
 })
