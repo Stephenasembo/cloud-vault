@@ -31,6 +31,7 @@ export default function Home() {
         renderItem={({item}) => (
           <FolderCard
           folderName={item.name}
+          folderId={item.id}
           />
         )}
         />

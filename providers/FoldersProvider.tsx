@@ -3,7 +3,7 @@ import { Folder } from "../types/folder";
 import { getFolders } from "../services/folder";
 import { useAuthContext } from "../context/AuthContext";
 import {FoldersContext} from "../context/FoldersContext";
-import { createFolder } from "../services/folder";
+import { createFolder, deleteFolder } from "../services/folder";
 
 
 export default function FoldersProvider({children} : PropsWithChildren) {
@@ -34,13 +34,22 @@ export default function FoldersProvider({children} : PropsWithChildren) {
     }
   }
 
+  async function deleteUserFolder(folderId: string): Promise<string> {
+    const status = await deleteFolder(folderId);
+    if(!status) {
+      return "Failed to delete folder"
+    }
+    await refreshFolders();
+    return "Folder deleted successfully"
+  }
+
   console.log("Fetsched folders:", userFolders)
   useEffect(() => {
     refreshFolders()
   }, [userId])
 
   return (
-    <FoldersContext value={{ userFolders, refreshFolders, addFolder }}>
+    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder }}>
       {children}
     </FoldersContext>
   )
