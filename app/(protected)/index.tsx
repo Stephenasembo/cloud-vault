@@ -6,11 +6,13 @@ import FolderCard from "../../components/FolderCard";
 import { useFoldersContext } from "../../context/FoldersContext";
 import { Folder } from "../../types/folder";
 import FolderModal from "../../components/FolderModal";
+import { useRouter } from "expo-router";
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
   const { userFolders, addFolder } = useFoldersContext();
+  const router = useRouter();
 
   async function handleFolderName() {
     setModalVisible(false);
@@ -19,6 +21,10 @@ export default function Home() {
       'Testing supabase functions',
       `New folder created`
     )
+  }
+
+  function openFolder(id: string) {
+    router.navigate(`/folder/${id}`)
   }
 
   return (
@@ -33,6 +39,7 @@ export default function Home() {
           <FolderCard
           folderName={item.name}
           folderId={item.id}
+          openFolder={openFolder}
           />
         )}
         />

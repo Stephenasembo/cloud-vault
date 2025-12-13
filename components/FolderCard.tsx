@@ -6,9 +6,10 @@ import FolderModal from "./FolderModal";
 export type FolderCardProps = {
   folderName: string;
   folderId: string;
+  openFolder: (id: string) => void;
 }
 
-export default function FolderCard ({ folderName, folderId }: FolderCardProps) {
+export default function FolderCard ({ folderName, folderId, openFolder }: FolderCardProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [newFolderName, setNewFolderName] = useState(folderName);
 
@@ -38,6 +39,7 @@ export default function FolderCard ({ folderName, folderId }: FolderCardProps) {
           <Text>{folderName}</Text>
           <Pressable
           style={styles.button}
+          onPress={() => openFolder(folderId)}
           >
             <Text>Open</Text>
           </Pressable>
