@@ -9,12 +9,11 @@ import { Folder } from "../../types/folder";
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const { userId } = useAuthContext();
-  const { userFolders } = useFoldersContext();
+  const { userFolders, addFolder } = useFoldersContext();
 
   async function handleFolderName() {
     setModalVisible(false);
-    await createFolder(folderName, userId);
+    await addFolder(folderName);
     Alert.alert(
       'Testing supabase functions',
       `New folder created`
