@@ -1,11 +1,21 @@
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, FlatList } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { uploadFile } from '../../../../services/storage';
+import { readFolderUploads, uploadFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
+import { useEffect, useState } from 'react';
+import { FileObject } from '@supabase/storage-js';
+import FileCard from '../../../../components/FileCard';
+import { useFoldersContext } from '../../../../context/FoldersContext';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [ files, setFiles] = useState<FileObject[] | []>([]);
+
+  useEffect(() => {
+    if (!userId || !id) return;
+    readFolderUploads(userId, id).then(data => setFiles(data))
+  }, [userId, id])
 
   async function handleUpload(): Promise<void> {
     if(!userId) return;
@@ -18,8 +28,23 @@ export default function FolderScreen() {
   return (
     <View style={styles.container}>
       <Text>Welcome to the folder screen</Text>
-      <Text>This folder's id is:</Text>
-      <Text>{id}</Text>
+      {files.length > 0 ?
+      <FlatList
+      contentContainerStyle={{ padding: 16 }}
+      data={files}
+      keyExtractor={(item: FileObject) => item.id}
+      renderItem={({item}) => (
+        <FileCard
+        name={item.name}
+        size={item.metadata.size}
+        uploadedAt={item.updated_at}
+        />
+      )}
+      /> :
+      <View>
+        <Text>No files uploaded yet.</Text>
+      </View>
+      }
       <Pressable
       style={styles.addButton}
       onPress={handleUpload}
@@ -34,7 +59,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
 
   addButton: {

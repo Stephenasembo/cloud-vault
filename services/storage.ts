@@ -1,6 +1,7 @@
 import { decode } from 'base64-arraybuffer'
 import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
+import { FileObject } from '@supabase/storage-js'
 
 export async function uploadFile(userId: string, folderId: string): Promise<string> {
   const file = await pickFile()
@@ -22,4 +23,23 @@ export async function uploadFile(userId: string, folderId: string): Promise<stri
   };
   console.log('Uploaded file data:', data)
   return 'File uploaded successfully.'
+}
+
+export async function readFolderUploads(userId: string, folderId: string): Promise<FileObject[] | []> {
+  const { data, error } = await supabase
+  .storage
+  .from('cloudvault_userfiles')
+  .list(`public/${userId}/${folderId}`, {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' },
+  })
+
+  if(error) {
+    console.log(error)
+    return []
+  }
+  console.log('Folder files:', data)
+  return data;
+
 }
