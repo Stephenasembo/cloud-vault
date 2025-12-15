@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import Popover from 'react-native-popover-view'
 import { Placement } from 'react-native-popover-view/dist/Types'
 import { useAuthContext } from '../context/AuthContext'
-import { deleteFile } from '../services/storage'
+import { deleteFile, shareFile } from '../services/storage'
 
 type FileCardProps = {
   name: string
@@ -31,6 +31,19 @@ export default function FileCard({
         'File deleted successfully.'
       )
     }
+  }
+
+  async function handleShare() {
+    const filePath = `public/${userId}/${folderId}/${name}`;
+    const shareLink = await shareFile(filePath);
+    if(!shareLink) {
+      Alert.alert('An error occured on sharing the file.');
+      return
+    }
+    Alert.alert(
+      'Copy This Link To Share Your Uploaded Files With Others',
+      shareLink
+    )
   }
 
   return (
@@ -68,6 +81,7 @@ export default function FileCard({
               </Pressable>
               <Pressable
               style={styles.modalButton}
+              onPress={handleShare}
               >
                 <Text style={styles.modalButtonText}>Share</Text>
               </Pressable>

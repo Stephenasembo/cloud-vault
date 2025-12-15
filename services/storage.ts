@@ -57,3 +57,17 @@ export async function deleteFile(filePath: string) {
   console.log("File deleted:", data);
   return true
 }
+
+export async function shareFile(filePath: string): Promise<string | null> {
+  const { data, error } = await supabase
+  .storage
+  .from('cloudvault_userfiles')
+  .createSignedUrl(filePath, 300)
+
+  if(error) {
+    console.log("Error on creating share link:", error)
+    return null;
+  }
+  console.log("File share link:", data.signedUrl)
+  return data.signedUrl;
+}
