@@ -1,21 +1,36 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native'
 import { formatFileSize, formatDate } from '../utils/fileDetailsFormat'
+import { useState, useRef } from 'react'
+import Popover from 'react-native-popover-view'
+import { Placement } from 'react-native-popover-view/dist/Types'
+import { useAuthContext } from '../context/AuthContext'
+import { deleteFile } from '../services/storage'
 
 type FileCardProps = {
   name: string
   size: number
   uploadedAt: string
+  folderId: string
 }
 
 export default function FileCard({
   name,
   size,
   uploadedAt,
+  folderId,
 }: FileCardProps) {
-  function handleMenuPress() {
-    Alert.alert(
-      'Card menu coming soon.'
-    )
+
+  const { userId } = useAuthContext();
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  async function handleDelete() {
+    const filePath = `public/${userId}/${folderId}/${name}`;
+    const status = await deleteFile(filePath);
+    if(status) {
+      Alert.alert(
+        'File deleted successfully.'
+      )
+    }
   }
 
   return (
@@ -30,12 +45,35 @@ export default function FileCard({
               {name}
             </Text>
           </View>
-          <Pressable
-          style={styles.menuButton}
-          onPress={handleMenuPress}
+
+          <Popover
+          isVisible={menuVisible}
+          from={(
+            <Pressable
+            style={styles.menuButton}
+            onPress={() => setMenuVisible(true)}
+            >
+              <Text style={styles.menuButtonText}>Menu</Text>
+            </Pressable>
+          )}
+          placement={Placement.BOTTOM}
+          onRequestClose={() => setMenuVisible(false)}
           >
-            <Text style={styles.menuButtonText}>Menu</Text>
-          </Pressable>
+            <View style={styles.modalContent}>
+              <Pressable
+              style={styles.modalButton}
+              onPress={handleDelete}
+              >
+                <Text style={[styles.modalButtonText, styles.deleteText]}>Delete</Text>
+              </Pressable>
+              <Pressable
+              style={styles.modalButton}
+              >
+                <Text style={styles.modalButtonText}>Share</Text>
+              </Pressable>
+            </View>
+          </Popover>
+
         </View>
         <View style={styles.metaDataContainer}>
           <Text style={styles.metaText}>
@@ -105,4 +143,39 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 
+  modalContent: {
+    borderWidth: 1,
+    backgroundColor: 'white',
+    minWidth: 160,
+    elevation: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 6,
+    borderRadius: 12,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 6 },
+  },
+
+  modalButton: {
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    fontSize: 16,
+    margin: 8,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  modalButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+
+  deleteText: {
+    color: '#DC2626',
+  },
 })

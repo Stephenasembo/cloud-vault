@@ -38,6 +38,7 @@ export default function FolderScreen() {
         name={item.name}
         size={item.metadata.size}
         uploadedAt={item.updated_at}
+        folderId={id}
         />
       )}
       /> :

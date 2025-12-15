@@ -43,3 +43,17 @@ export async function readFolderUploads(userId: string, folderId: string): Promi
   return data;
 
 }
+
+export async function deleteFile(filePath: string) {
+  const { data, error } = await supabase
+  .storage
+  .from('cloudvault_userfiles')
+  .remove([`${filePath}`])
+
+  if(error) {
+    console.log(error);
+    return false;
+  }
+  console.log("File deleted:", data);
+  return true
+}
