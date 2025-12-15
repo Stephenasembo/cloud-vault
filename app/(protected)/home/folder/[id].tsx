@@ -19,10 +19,18 @@ export default function FolderScreen() {
 
   async function handleUpload(): Promise<void> {
     if(!userId) return;
-    const message = await uploadFile(userId, id);
+    const file = await uploadFile(userId, id);
+    if(!file) {
+      Alert.alert(
+        'An error occured while uploading this file.'
+      )
+      return
+    }
     Alert.alert(
-      message
+      'File uploaded successfully.'
     )
+    const newFiles = await readFolderUploads(userId, id);
+    setFiles(newFiles); 
   }
  
   return (
@@ -39,6 +47,8 @@ export default function FolderScreen() {
         size={item.metadata.size}
         uploadedAt={item.updated_at}
         folderId={id}
+        setFiles={setFiles}
+        id={item.id}
         />
       )}
       /> :

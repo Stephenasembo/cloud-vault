@@ -3,9 +3,15 @@ import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
 import { FileObject } from '@supabase/storage-js'
 
-export async function uploadFile(userId: string, folderId: string): Promise<string> {
+export type uploadDetailsType = {
+  id: string;
+  path: string;
+  fullPath: string;
+}
+
+export async function uploadFile(userId: string, folderId: string): Promise<null | uploadDetailsType> {
   const file = await pickFile()
-  if(!file) return 'Error on uploading file.'
+  if(!file) return null;
   const base64String = await readFileAsBase64(file.uri);
 
   const filePath = `public/${userId}/${folderId}/${Date.now()}-${file.name}`
@@ -19,10 +25,10 @@ export async function uploadFile(userId: string, folderId: string): Promise<stri
   
   if(error){
     console.log(error)
-    return 'Error on uploading file.'
+    return null;
   };
   console.log('Uploaded file data:', data)
-  return 'File uploaded successfully.'
+  return data;
 }
 
 export async function readFolderUploads(userId: string, folderId: string): Promise<FileObject[] | []> {

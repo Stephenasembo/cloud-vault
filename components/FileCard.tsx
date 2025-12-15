@@ -1,16 +1,20 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native'
 import { formatFileSize, formatDate } from '../utils/fileDetailsFormat'
-import { useState, useRef } from 'react'
+import { useState, SetStateAction, Dispatch } from 'react'
 import Popover from 'react-native-popover-view'
 import { Placement } from 'react-native-popover-view/dist/Types'
 import { useAuthContext } from '../context/AuthContext'
 import { deleteFile, shareFile } from '../services/storage'
+import { useFoldersContext } from '../context/FoldersContext'
+import { FileObject } from '@supabase/storage-js';
 
 type FileCardProps = {
   name: string
   size: number
   uploadedAt: string
   folderId: string
+  setFiles: Dispatch<SetStateAction<FileObject[] | []>>
+  id: string
 }
 
 export default function FileCard({
@@ -18,6 +22,8 @@ export default function FileCard({
   size,
   uploadedAt,
   folderId,
+  setFiles,
+  id,
 }: FileCardProps) {
 
   const { userId } = useAuthContext();
@@ -30,6 +36,7 @@ export default function FileCard({
       Alert.alert(
         'File deleted successfully.'
       )
+      setFiles(prev => prev.filter(f => f.id !== id))
     }
   }
 
