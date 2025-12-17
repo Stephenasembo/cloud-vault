@@ -6,20 +6,25 @@ import { useEffect, useState } from 'react';
 import { FileObject } from '@supabase/storage-js';
 import FileCard from '../../../../components/FileCard';
 import { useFoldersContext } from '../../../../context/FoldersContext';
+import MenuPopover from '../../../../components/MenuPopover';
+import { PickedFileType } from '../../../../types/pickedFile';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: folderId } = useLocalSearchParams<{ id: string }>();
+
   const [ files, setFiles] = useState<FileObject[] | []>([]);
+  const [menuVisible, setMenuVisible] = useState<boolean>(false);
+  const [pickedFile, setPickedFile] = useState<PickedFileType | null>(null)
 
   useEffect(() => {
-    if (!userId || !id) return;
-    readFolderUploads(userId, id).then(data => setFiles(data))
-  }, [userId, id])
+    if (!userId || !folderId) return;
+    readFolderUploads(userId, folderId).then(data => setFiles(data))
+  }, [userId, folderId])
 
   async function handleUpload(): Promise<void> {
     if(!userId) return;
-    const file = await uploadFile(userId, id);
+    const file = await uploadFile(userId, folderId);
     if(!file) {
       Alert.alert(
         'An error occured while uploading this file.'
@@ -29,9 +34,11 @@ export default function FolderScreen() {
     Alert.alert(
       'File uploaded successfully.'
     )
-    const newFiles = await readFolderUploads(userId, id);
+    const newFiles = await readFolderUploads(userId, folderId);
     setFiles(newFiles); 
   }
+
+  if(!userId || !folderId) return null;
  
   return (
     <View style={styles.container}>
@@ -46,9 +53,13 @@ export default function FolderScreen() {
         name={item.name}
         size={item.metadata.size}
         uploadedAt={item.updated_at}
-        folderId={id}
+        folderId={folderId}
         setFiles={setFiles}
         id={item.id}
+        openMenu={(pickedFile: PickedFileType) => {
+          setMenuVisible(true);
+          setPickedFile(pickedFile)
+        }}
         />
       )}
       /> :
@@ -56,6 +67,19 @@ export default function FolderScreen() {
         <Text>No files uploaded yet.</Text>
       </View>
       }
+
+      {pickedFile &&
+        <MenuPopover
+          userId={userId}
+          folderId={folderId}
+          name={pickedFile.name}
+          fileId={pickedFile.fileId}
+          coordinates={pickedFile.coordinates}
+          menuVisible={menuVisible}
+          setMenuVisible={setMenuVisible}
+          setFiles={setFiles}/>
+      }
+
       <Pressable
       style={styles.addButton}
       onPress={handleUpload}

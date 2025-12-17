@@ -1,12 +1,9 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native'
 import { formatFileSize, formatDate } from '../utils/fileDetailsFormat'
-import { useState, SetStateAction, Dispatch } from 'react'
-import Popover from 'react-native-popover-view'
-import { Placement } from 'react-native-popover-view/dist/Types'
+import { SetStateAction, Dispatch, useRef } from 'react'
 import { useAuthContext } from '../context/AuthContext'
-import { deleteFile, shareFile } from '../services/storage'
-import { useFoldersContext } from '../context/FoldersContext'
 import { FileObject } from '@supabase/storage-js';
+import { PickedFileType } from '../types/pickedFile';
 
 type FileCardProps = {
   name: string
@@ -15,6 +12,7 @@ type FileCardProps = {
   folderId: string
   setFiles: Dispatch<SetStateAction<FileObject[] | []>>
   id: string
+  openMenu: (chosenFile: PickedFileType) => void
 }
 
 export default function FileCard({
@@ -24,34 +22,11 @@ export default function FileCard({
   folderId,
   setFiles,
   id,
+  openMenu
 }: FileCardProps) {
 
   const { userId } = useAuthContext();
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  async function handleDelete() {
-    const filePath = `public/${userId}/${folderId}/${name}`;
-    const status = await deleteFile(filePath);
-    if(status) {
-      Alert.alert(
-        'File deleted successfully.'
-      )
-      setFiles(prev => prev.filter(f => f.id !== id))
-    }
-  }
-
-  async function handleShare() {
-    const filePath = `public/${userId}/${folderId}/${name}`;
-    const shareLink = await shareFile(filePath);
-    if(!shareLink) {
-      Alert.alert('An error occured on sharing the file.');
-      return
-    }
-    Alert.alert(
-      'Copy This Link To Share Your Uploaded Files With Others',
-      shareLink
-    )
-  }
+  const menuRef = useRef<View | null>(null);
 
   return (
     <View style={styles.card}>
@@ -65,36 +40,28 @@ export default function FileCard({
               {name}
             </Text>
           </View>
-
-          <Popover
-          isVisible={menuVisible}
-          from={(
-            <Pressable
-            style={styles.menuButton}
-            onPress={() => setMenuVisible(true)}
-            >
-              <Text style={styles.menuButtonText}>Menu</Text>
-            </Pressable>
-          )}
-          placement={Placement.BOTTOM}
-          onRequestClose={() => setMenuVisible(false)}
+          <View
           >
-            <View style={styles.modalContent}>
+            <View
+            ref={menuRef}
+            collapsable={false}
+            >
               <Pressable
-              style={styles.modalButton}
-              onPress={handleDelete}
-              >
-                <Text style={[styles.modalButtonText, styles.deleteText]}>Delete</Text>
-              </Pressable>
-              <Pressable
-              style={styles.modalButton}
-              onPress={handleShare}
-              >
-                <Text style={styles.modalButtonText}>Share</Text>
+              style={styles.menuButton}
+              onPress={() => {
+                menuRef.current?.measureInWindow((x, y, width, height) => {
+                openMenu({
+                name,
+                fileId: id,
+                coordinates: {
+                  x: x + width / 2,
+                  y: y + height + 12,
+                },
+              })})}}>
+                <Text style={styles.menuButtonText}>Menu</Text>
               </Pressable>
             </View>
-          </Popover>
-
+          </View>
         </View>
         <View style={styles.metaDataContainer}>
           <Text style={styles.metaText}>
@@ -155,8 +122,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: 20,
     flexShrink: 0,
+    minWidth: 48,
+    minHeight: 48,
+    justifyContent: 'center',
   },
 
   menuButtonText: {
