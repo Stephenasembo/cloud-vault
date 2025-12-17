@@ -4,6 +4,7 @@ import { SetStateAction, Dispatch, useRef } from 'react'
 import { useAuthContext } from '../context/AuthContext'
 import { FileObject } from '@supabase/storage-js';
 import { PickedFileType } from '../types/pickedFile';
+import { categorizeFile } from '../utils/categorizeFile';
 
 type FileCardProps = {
   name: string
@@ -12,7 +13,8 @@ type FileCardProps = {
   folderId: string
   setFiles: Dispatch<SetStateAction<FileObject[] | []>>
   id: string
-  openMenu: (chosenFile: PickedFileType) => void
+  openMenu: (chosenFile: PickedFileType) => void;
+  fileType: string;
 }
 
 export default function FileCard({
@@ -22,7 +24,8 @@ export default function FileCard({
   folderId,
   setFiles,
   id,
-  openMenu
+  openMenu,
+  fileType,
 }: FileCardProps) {
 
   const { userId } = useAuthContext();
@@ -65,7 +68,7 @@ export default function FileCard({
         </View>
         <View style={styles.metaDataContainer}>
           <Text style={styles.metaText}>
-            {formatFileSize(size)} • {formatDate(uploadedAt)}
+            {categorizeFile(fileType)} • {formatFileSize(size)} • {formatDate(uploadedAt)}
           </Text>
         </View>
       </View>

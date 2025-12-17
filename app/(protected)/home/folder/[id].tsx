@@ -56,6 +56,7 @@ export default function FolderScreen() {
         folderId={folderId}
         setFiles={setFiles}
         id={item.id}
+        fileType={item.metadata.mimetype}
         openMenu={(pickedFile: PickedFileType) => {
           setMenuVisible(true);
           setPickedFile(pickedFile)
