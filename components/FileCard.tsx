@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native'
 import { formatFileSize, formatDate } from '../utils/fileDetailsFormat'
-import { SetStateAction, Dispatch, useRef } from 'react'
+import { SetStateAction, Dispatch, useRef, useEffect, useState } from 'react'
 import { useAuthContext } from '../context/AuthContext'
 import { FileObject } from '@supabase/storage-js';
 import { PickedFileType } from '../types/pickedFile';
 import { categorizeFile } from '../utils/categorizeFile';
+import { getFileDisplayName } from '../services/file';
 
 type FileCardProps = {
   name: string
@@ -30,6 +31,17 @@ export default function FileCard({
 
   const { userId } = useAuthContext();
   const menuRef = useRef<View | null>(null);
+  const [displayName, setDisplayName] = useState(name);
+
+  useEffect(() => {
+    async function fetchFileDisplayName() {
+      const fileDisplayName = await getFileDisplayName(id);
+      if(fileDisplayName) {
+        setDisplayName(fileDisplayName)
+      }
+    }
+    fetchFileDisplayName()
+  }, [id])
 
   return (
     <View style={styles.card}>
@@ -40,7 +52,7 @@ export default function FileCard({
             style={styles.fileName}
             numberOfLines={1} ellipsizeMode="tail"
             >
-              {name}
+              {displayName}
             </Text>
           </View>
           <View

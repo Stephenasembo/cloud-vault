@@ -63,7 +63,7 @@ export default function FolderScreen() {
       keyExtractor={(item: FileObject) => item.id}
       renderItem={({item}) => (
         <FileCard
-        name={item.name}
+        name={item.metadata.display_name}
         size={item.metadata.size}
         uploadedAt={item.updated_at}
         folderId={folderId}

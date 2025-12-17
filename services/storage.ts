@@ -2,6 +2,7 @@ import { decode } from 'base64-arraybuffer'
 import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
 import { FileObject } from '@supabase/storage-js'
+import { createFileMetadata } from './file'
 
 export type uploadDetailsType = {
   id: string;
@@ -20,7 +21,9 @@ export async function uploadFile(userId: string, folderId: string): Promise<null
     .storage
     .from('cloudvault_userfiles')
     .upload(filePath, decode(base64String), {
-      contentType: file.mimeType
+      contentType: file.mimeType,
+      upsert: false,
+      metadata: { display_name: file.name }
     })
   
   if(error){
@@ -28,6 +31,11 @@ export async function uploadFile(userId: string, folderId: string): Promise<null
     return null;
   };
   console.log('Uploaded file data:', data)
+  const fileData = await createFileMetadata(data.id, userId, file.name, filePath);
+  if(!fileData) {
+    console.log("Error creating file metadata", fileData);
+    return null
+  }
   return data;
 }
 
