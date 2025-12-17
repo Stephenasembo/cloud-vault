@@ -10,21 +10,21 @@ import {
 } from "react-native";
 import { Dispatch, SetStateAction } from "react";
 
-export type FolderModalProps = {
+export type InputModalProps = {
   modalVisible: boolean;
   setModalVisible: Dispatch<SetStateAction<boolean>>;
-  setFolderName: Dispatch<SetStateAction<string>>;
-  handleFolderName: () => Promise<void>;
+  setNewName: Dispatch<SetStateAction<string>>;
+  handleNewName: () => Promise<void>;
   modalTitle: string;
 }
 
-export default function FolderModal({
+export default function InputModal({
   modalVisible,
   setModalVisible,
-  setFolderName,
-  handleFolderName,
+  setNewName,
+  handleNewName,
   modalTitle,
-}: FolderModalProps) {
+}: InputModalProps) {
   return (
     <Modal
     visible={modalVisible}
@@ -47,7 +47,7 @@ export default function FolderModal({
           placeholder="Enter folder name"
           style={styles.input}
           autoFocus
-          onChangeText={setFolderName}
+          onChangeText={setNewName}
           />
         </View>
         <View style={styles.modalButtons}>
@@ -58,7 +58,7 @@ export default function FolderModal({
             <Text>Cancel</Text>
           </Pressable>
           <Pressable
-          onPress={handleFolderName}
+          onPress={handleNewName}
           style={styles.modalButton}
           >
             <Text>Save</Text>

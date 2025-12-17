@@ -13,7 +13,8 @@ export type MenuType = {
   menuVisible: boolean;
   setMenuVisible: Dispatch<SetStateAction<boolean>>;
   setFiles: Dispatch<SetStateAction<FileObject[] | []>>;
-  coordinates: { x: number, y: number}
+  coordinates: { x: number, y: number};
+  setModalVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function MenuPopover({
@@ -25,6 +26,7 @@ export default function MenuPopover({
   setMenuVisible,
   setFiles,
   coordinates,
+  setModalVisible,
 }: MenuType) {
 
   const point = useMemo(() => new Point(coordinates.x, coordinates.y),
@@ -55,6 +57,12 @@ export default function MenuPopover({
       shareLink
     )
   }
+
+  async function handleRename() {
+    setMenuVisible(false)
+    setModalVisible(true)
+  }
+  
   return (
     <Popover
     isVisible={menuVisible}
@@ -74,6 +82,12 @@ export default function MenuPopover({
         onPress={handleShare}
         >
           <Text style={styles.modalButtonText}>Share</Text>
+        </Pressable>
+        <Pressable
+        style={styles.modalButton}
+        onPress={handleRename}
+        >
+          <Text style={styles.modalButtonText}>Rename</Text>
         </Pressable>
       </View>
     </Popover>

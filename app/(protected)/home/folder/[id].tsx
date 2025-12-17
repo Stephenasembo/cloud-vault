@@ -8,6 +8,7 @@ import FileCard from '../../../../components/FileCard';
 import { useFoldersContext } from '../../../../context/FoldersContext';
 import MenuPopover from '../../../../components/MenuPopover';
 import { PickedFileType } from '../../../../types/pickedFile';
+import InputModal from '../../../../components/InputModal';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -15,7 +16,19 @@ export default function FolderScreen() {
 
   const [ files, setFiles] = useState<FileObject[] | []>([]);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
-  const [pickedFile, setPickedFile] = useState<PickedFileType | null>(null)
+  const [pickedFile, setPickedFile] = useState<PickedFileType | null>(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newName, setNewName] = useState('');
+
+  async function handleFileEdit() {
+    setModalVisible(false)
+    const message = `File name changed to: ${newName}`
+    Alert.alert(
+      message
+    )
+  }
+
 
   useEffect(() => {
     if (!userId || !folderId) return;
@@ -78,9 +91,19 @@ export default function FolderScreen() {
           coordinates={pickedFile.coordinates}
           menuVisible={menuVisible}
           setMenuVisible={setMenuVisible}
-          setFiles={setFiles}/>
+          setFiles={setFiles}
+          setModalVisible={setModalVisible}
+          />
       }
 
+      <InputModal
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+      setNewName={setNewName}
+      handleNewName={handleFileEdit}
+      modalTitle="Edit file name"
+      />
+      
       <Pressable
       style={styles.addButton}
       onPress={handleUpload}

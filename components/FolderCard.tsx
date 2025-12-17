@@ -1,7 +1,7 @@
 import { Pressable, View, Text, StyleSheet, Alert } from "react-native"
 import { useFoldersContext } from "../context/FoldersContext";
 import { Dispatch, SetStateAction, useState } from "react";
-import FolderModal from "./FolderModal";
+import InputModal from "./InputModal";
 
 export type FolderCardProps = {
   folderName: string;
@@ -57,11 +57,11 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
           </Pressable>
         </View>
       </Pressable>
-      <FolderModal
+      <InputModal
       modalVisible={modalVisible}
       setModalVisible={setModalVisible}
-      setFolderName={setNewFolderName}
-      handleFolderName={handleEdit}
+      setNewName={setNewFolderName}
+      handleNewName={handleEdit}
       modalTitle="Edit folder name"
       />
     </View>

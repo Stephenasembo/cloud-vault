@@ -5,7 +5,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import FolderCard from "../../../components/FolderCard";
 import { useFoldersContext } from "../../../context/FoldersContext";
 import { Folder } from "../../../types/folder";
-import FolderModal from "../../../components/FolderModal";
+import InputModal from "../../../components/InputModal";
 import { useRouter } from "expo-router";
 
 export default function Home() {
@@ -51,11 +51,11 @@ export default function Home() {
         <Text style={styles.addButtonText}>+</Text>
       </Pressable>
       <View>
-        <FolderModal
+        <InputModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        setFolderName={setFolderName}
-        handleFolderName={handleFolderName}
+        setNewName={setFolderName}
+        handleNewName={handleFolderName}
         modalTitle="Create new folder"
         />
       </View>
