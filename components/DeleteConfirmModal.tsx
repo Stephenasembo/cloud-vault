@@ -12,7 +12,7 @@ export type DeleteConfirmModalProps = {
   setModalVisible: Dispatch<SetStateAction<boolean>>;
   onConfirm: () => Promise<void>;
   title: string;
-  fileName?: string;
+  assetName?: string;
 };
 
 export default function DeleteConfirmModal({
@@ -20,9 +20,8 @@ export default function DeleteConfirmModal({
   setModalVisible,
   onConfirm,
   title,
-  fileName,
+  assetName,
 }: DeleteConfirmModalProps) {
-  console.log({fileName})
   return (
     <Modal
       visible={modalVisible}
@@ -40,7 +39,7 @@ export default function DeleteConfirmModal({
           <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalDescription}>
             Are you sure you want to delete{' '}
-            <Text style={{ fontWeight: '600'}}>{fileName}</Text>?
+            <Text style={{ fontWeight: '600'}}>{assetName}</Text>?
             {'\n'}This action cannot be undone
           </Text>
 

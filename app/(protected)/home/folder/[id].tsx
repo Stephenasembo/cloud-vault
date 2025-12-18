@@ -144,7 +144,7 @@ export default function FolderScreen() {
       setModalVisible={setDeleteModalVisible}
       onConfirm={handleFileDelete}
       title = "Delete file"
-      fileName={pickedFile?.name}
+      assetName={pickedFile?.name}
       />
       
       <Pressable

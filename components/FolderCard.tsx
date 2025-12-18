@@ -2,6 +2,7 @@ import { Pressable, View, Text, StyleSheet, Alert } from "react-native"
 import { useFoldersContext } from "../context/FoldersContext";
 import { Dispatch, SetStateAction, useState } from "react";
 import InputModal from "./InputModal";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 export type FolderCardProps = {
   folderName: string;
@@ -12,11 +13,12 @@ export type FolderCardProps = {
 export default function FolderCard ({ folderName, folderId, openFolder }: FolderCardProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [newFolderName, setNewFolderName] = useState(folderName);
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
 
   const { deleteUserFolder, editUserFolder } = useFoldersContext();
   
-  async function handleDelete(id: string) {
-    const message = await deleteUserFolder(id);
+  async function handleDelete() {
+    const message = await deleteUserFolder(folderId);
     Alert.alert(
       message
     )
@@ -51,7 +53,7 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
           </Pressable>
           <Pressable
           style={styles.button}
-          onPress={() => handleDelete(folderId)}
+          onPress={() => setDeleteModalVisible(true)}
           >
             <Text>Delete</Text>
           </Pressable>
@@ -63,6 +65,13 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
       setNewName={setNewFolderName}
       handleNewName={handleEdit}
       modalTitle="Edit folder name"
+      />
+      <DeleteConfirmModal
+      modalVisible={deleteModalVisible}
+      setModalVisible={setDeleteModalVisible}
+      onConfirm={handleDelete}
+      title = "Delete folder"
+      assetName={folderName}
       />
     </View>
   )
