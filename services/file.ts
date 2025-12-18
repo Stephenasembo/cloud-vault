@@ -29,3 +29,19 @@ export async function createFileMetadata(fileId: string, userId: string, fileNam
   console.log("Successfully added file metadata", data);
   return data;
 }
+
+export async function updateDisplayName(newName: string, fileId: string) {
+  const { data, error } = await supabase
+  .from('Files')
+  .update({ display_name: newName })
+  .eq('id', fileId)
+  .select()
+  .single()
+
+  if(error) {
+    console.log("An error occured while updating the file name", error)
+    return null;
+  }
+  console.log("Successfully updated the file name", data);
+  return data;
+}

@@ -9,6 +9,7 @@ import { useFoldersContext } from '../../../../context/FoldersContext';
 import MenuPopover from '../../../../components/MenuPopover';
 import { PickedFileType } from '../../../../types/pickedFile';
 import InputModal from '../../../../components/InputModal';
+import { updateDisplayName } from '../../../../services/file';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -23,9 +24,24 @@ export default function FolderScreen() {
 
   async function handleFileEdit() {
     setModalVisible(false)
-    const message = `File name changed to: ${newName}`
+    if(!pickedFile) {
+      console.log("Error updating file name: File id is null")
+      return;
+    }
+    const data = await updateDisplayName(newName, pickedFile.fileId)
+    if(!data) return;
+
+    const newFiles = files.map(file => file.id === data.id ? {
+      ...file,
+      metadata: {...file.metadata, display_name: data.display_name},
+    }: file);
+
+    console.log(files);
+    console.log(newFiles);
+
+    setFiles(newFiles)
     Alert.alert(
-      message
+      'File name updated successfully.'
     )
   }
 

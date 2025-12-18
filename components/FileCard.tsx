@@ -41,7 +41,7 @@ export default function FileCard({
       }
     }
     fetchFileDisplayName()
-  }, [id])
+  }, [id, name])
 
   return (
     <View style={styles.card}>
