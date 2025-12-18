@@ -3,16 +3,23 @@ import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
 import { FileObject } from '@supabase/storage-js'
 import { createFileMetadata } from './file'
+import { ErrorType, FilePickSuccess } from '../utils/filePicker'
 
-export type uploadDetailsType = {
+export type UploadSuccessType = {
+  error: false
   id: string;
   path: string;
   fullPath: string;
 }
 
-export async function uploadFile(userId: string, folderId: string): Promise<null | uploadDetailsType> {
-  const file = await pickFile()
-  if(!file) return null;
+export async function uploadFile(userId: string, folderId: string): Promise<UploadSuccessType | ErrorType> {
+  const file = await pickFile();
+  if(file.error) return {
+    error: true,
+    messageTitle: file.messageTitle,
+    message: file.message,
+  };
+
   const base64String = await readFileAsBase64(file.uri);
 
   const filePath = `public/${userId}/${folderId}/${Date.now()}-${file.name}`
@@ -28,15 +35,28 @@ export async function uploadFile(userId: string, folderId: string): Promise<null
   
   if(error){
     console.log(error)
-    return null;
+    return {
+      error: true,
+      messageTitle: "An internal storage error occured while uploading the file",
+      message: "Please try again"
+    };
   };
   console.log('Uploaded file data:', data)
   const fileData = await createFileMetadata(data.id, userId, file.name, filePath);
   if(!fileData) {
     console.log("Error creating file metadata", fileData);
-    return null
+    return {
+      error: true,
+      messageTitle: "Error while uploading file.",
+      message: "Please try again",
+    }
   }
-  return data;
+  return {
+    error: false,
+    id: data.id,
+    path: data.path,
+    fullPath: data.fullPath,
+  }
 }
 
 export async function readFolderUploads(userId: string, folderId: string): Promise<FileObject[] | []> {

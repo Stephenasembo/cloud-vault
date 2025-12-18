@@ -54,9 +54,10 @@ export default function FolderScreen() {
   async function handleUpload(): Promise<void> {
     if(!userId) return;
     const file = await uploadFile(userId, folderId);
-    if(!file) {
+    if(file.error) {
       Alert.alert(
-        'An error occured while uploading this file.'
+        file.messageTitle,
+        file.message,
       )
       return
     }
