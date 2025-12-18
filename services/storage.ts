@@ -12,6 +12,11 @@ export type UploadSuccessType = {
   fullPath: string;
 }
 
+export type FileFetchSuccessType = {
+  error: false;
+  files: FileObject[];
+}
+
 export async function uploadFile(userId: string, folderId: string): Promise<UploadSuccessType | ErrorType> {
   const file = await pickFile();
   if(file.error) return {
@@ -59,7 +64,7 @@ export async function uploadFile(userId: string, folderId: string): Promise<Uplo
   }
 }
 
-export async function readFolderUploads(userId: string, folderId: string): Promise<FileObject[] | []> {
+export async function readFolderUploads(userId: string, folderId: string): Promise<FileFetchSuccessType | ErrorType> {
   const { data, error } = await supabase
   .storage
   .from('cloudvault_userfiles')
@@ -71,11 +76,16 @@ export async function readFolderUploads(userId: string, folderId: string): Promi
 
   if(error) {
     console.log(error)
-    return []
+    return {
+      error: true,
+      messageTitle: "An error occured while fetching files."
+    }
   }
   console.log('Folder files:', data)
-  return data;
-
+  return {
+    error: false,
+    files: data,
+  };
 }
 
 export async function deleteFile(filePath: string) {

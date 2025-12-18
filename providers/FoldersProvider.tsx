@@ -4,18 +4,25 @@ import { getFolders, updateFolder } from "../services/folder";
 import { useAuthContext } from "../context/AuthContext";
 import {FoldersContext} from "../context/FoldersContext";
 import { createFolder, deleteFolder } from "../services/folder";
+import { FetchingStatusType } from "../types/fetchingStatus";
 
 
 export default function FoldersProvider({children} : PropsWithChildren) {
   const { userId } = useAuthContext()
   const [userFolders, setUserFolders] = useState<Folder[] | []>([]);
+  const [folderFetchingStatus, setFolderFetchingStatus] = useState<FetchingStatusType>('idle');
 
   async function refreshFolders(): Promise<void> {
     if (!userId) return;
+    setFolderFetchingStatus('loading')
     try {
       const data = await getFolders(userId);
-      setUserFolders(data);
+      if(data) {
+        setFolderFetchingStatus('success');
+        setUserFolders(data);
+      }
     } catch (err) {
+      setFolderFetchingStatus('error')
       console.log("Failed to fetch folders:", err);
     }
   }
@@ -58,7 +65,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
   }, [userId])
 
   return (
-    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder, editUserFolder }}>
+    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder, editUserFolder, folderFetchingStatus }}>
       {children}
     </FoldersContext>
   )

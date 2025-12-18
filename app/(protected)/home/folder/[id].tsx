@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, FlatList, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { readFolderUploads, uploadFile, deleteFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
@@ -11,6 +11,7 @@ import { PickedFileType } from '../../../../types/pickedFile';
 import InputModal from '../../../../components/InputModal';
 import { updateDisplayName } from '../../../../services/file';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
+import { FetchingStatusType } from '../../../../types/fetchingStatus';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -19,6 +20,7 @@ export default function FolderScreen() {
   const [ files, setFiles] = useState<FileObject[] | []>([]);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
   const [pickedFile, setPickedFile] = useState<PickedFileType | null>(null);
+  const [fileFetchingStatus, setFileFetchingStatus] = useState<FetchingStatusType>('idle');
 
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
@@ -64,8 +66,19 @@ export default function FolderScreen() {
 
 
   useEffect(() => {
-    if (!userId || !folderId) return;
-    readFolderUploads(userId, folderId).then(data => setFiles(data))
+    async function fetchFiles() {
+      if (!userId || !folderId) return;
+      setFileFetchingStatus('loading')
+      const data = await readFolderUploads(userId, folderId);
+      if(data.error) {
+        setFileFetchingStatus('error');
+        Alert.alert(data.messageTitle);
+        return;
+      }
+      setFileFetchingStatus('success');
+      setFiles(data.files)
+    }
+    fetchFiles()
   }, [userId, folderId])
 
   async function handleUpload(): Promise<void> {
@@ -81,8 +94,10 @@ export default function FolderScreen() {
     Alert.alert(
       'File uploaded successfully.'
     )
-    const newFiles = await readFolderUploads(userId, folderId);
-    setFiles(newFiles); 
+    const data = await readFolderUploads(userId, folderId);
+    if(!data.error) {
+      setFiles(data.files);
+    }
   }
 
   if(!userId || !folderId) return null;
@@ -90,7 +105,18 @@ export default function FolderScreen() {
   return (
     <View style={styles.container}>
       <Text>Welcome to the folder screen</Text>
-      {files.length > 0 ?
+      {fileFetchingStatus === 'loading' ? 
+        <View style={{ alignItems: 'center', marginTop: 32 }}>
+          <ActivityIndicator size='large' />
+          <Text style={{ marginTop: 12, color: '#6B7280' }}>
+            Fetching files
+          </Text>
+        </View>
+        :
+      fileFetchingStatus === 'error' ?
+      <Text>Ooops an error occured while fetching files.</Text>
+      :
+      files.length > 0 ?
       <FlatList
       contentContainerStyle={{ padding: 16 }}
       data={files}

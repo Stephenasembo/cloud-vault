@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from "react-native" 
+import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList, ActivityIndicator } from "react-native" 
 import { createFolder } from "../../../services/folder";
 import { useAuthContext } from "../../../context/AuthContext";
 import FolderCard from "../../../components/FolderCard";
@@ -11,7 +11,7 @@ import { useRouter } from "expo-router";
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const { userFolders, addFolder } = useFoldersContext();
+  const { userFolders, addFolder, folderFetchingStatus } = useFoldersContext();
   const router = useRouter();
 
   async function handleFolderName() {
@@ -29,7 +29,21 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Text>Welcome to CloudVault</Text>
+      <View style={styles.headingContainer}>
+        <Text style={styles.heading}>Welcome to CloudVault</Text>
+      </View>
+      {folderFetchingStatus === 'loading' ? 
+      <View style={{ alignItems: 'center', marginTop: 32 }}>
+        <ActivityIndicator
+        size='large'
+        />
+        <Text style={{ marginTop: 12, color: '#6B7280' }}>
+          Fetching your folders.
+        </Text>
+      </View>
+      : folderFetchingStatus === 'error' ?
+      <Text>Ooops an error occured while fetching your folders</Text>
+      :
       <View style={styles.folderContainer}>
         <FlatList
         contentContainerStyle={styles.listContent}
@@ -44,6 +58,7 @@ export default function Home() {
         )}
         />
       </View>
+      }
       <Pressable
       style={styles.addButton}
       onPress={() => setModalVisible(true)}
@@ -70,7 +85,18 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
+  headingContainer: {
+    marginVertical: 16,
+    justifyContent: 'flex-start'
+  },
+
+  heading: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+
   folderContainer: {
+    flex: 1,
     width: '100%',
     marginVertical: 16,
   },
