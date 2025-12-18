@@ -15,6 +15,7 @@ export type MenuType = {
   setFiles: Dispatch<SetStateAction<FileObject[] | []>>;
   coordinates: { x: number, y: number};
   setModalVisible: Dispatch<SetStateAction<boolean>>;
+  setDeleteModalVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function MenuPopover({
@@ -27,22 +28,23 @@ export default function MenuPopover({
   setFiles,
   coordinates,
   setModalVisible,
+  setDeleteModalVisible,
 }: MenuType) {
 
   const point = useMemo(() => new Point(coordinates.x, coordinates.y),
   [coordinates.x, coordinates.y]);
 
-  async function handleDelete() {
-    setMenuVisible(false);
-    const filePath = `public/${userId}/${folderId}/${name}`;
-    const status = await deleteFile(filePath);
-    if(status) {
-      Alert.alert(
-        'File deleted successfully.'
-      )
-      setFiles(prev => prev.filter(f => f.id !== fileId))
-    }
-  }
+  // async function handleDelete() {
+  //   setMenuVisible(false);
+  //   const filePath = `public/${userId}/${folderId}/${name}`;
+  //   const status = await deleteFile(filePath);
+  //   if(status) {
+  //     Alert.alert(
+  //       'File deleted successfully.'
+  //     )
+  //     setFiles(prev => prev.filter(f => f.id !== fileId))
+  //   }
+  // }
 
   async function handleShare() {
     setMenuVisible(false)
@@ -73,7 +75,10 @@ export default function MenuPopover({
       <View style={styles.modalContent}>
         <Pressable
         style={styles.modalButton}
-        onPress={handleDelete}
+        onPress={() => {
+          setMenuVisible(false)
+          setDeleteModalVisible(true)
+        }}
         >
           <Text style={[styles.modalButtonText, styles.deleteText]}>Delete</Text>
         </Pressable>

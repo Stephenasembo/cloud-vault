@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, Alert, FlatList } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { readFolderUploads, uploadFile } from '../../../../services/storage';
+import { readFolderUploads, uploadFile, deleteFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { FileObject } from '@supabase/storage-js';
@@ -10,6 +10,7 @@ import MenuPopover from '../../../../components/MenuPopover';
 import { PickedFileType } from '../../../../types/pickedFile';
 import InputModal from '../../../../components/InputModal';
 import { updateDisplayName } from '../../../../services/file';
+import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -21,6 +22,8 @@ export default function FolderScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
+
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
 
   async function handleFileEdit() {
     setModalVisible(false)
@@ -43,6 +46,20 @@ export default function FolderScreen() {
     Alert.alert(
       'File name updated successfully.'
     )
+  }
+
+  async function handleFileDelete() {
+    setMenuVisible(false);
+    setDeleteModalVisible(false);
+    if (!userId || !folderId || !pickedFile) return;
+    const filePath = `public/${userId}/${folderId}/${pickedFile.name}`;
+    const status = await deleteFile(filePath);
+    if(status) {
+      Alert.alert(
+        'File deleted successfully.'
+      )
+      setFiles(prev => prev.filter(f => f.id !== pickedFile.fileId))
+    }
   }
 
 
@@ -110,6 +127,7 @@ export default function FolderScreen() {
           setMenuVisible={setMenuVisible}
           setFiles={setFiles}
           setModalVisible={setModalVisible}
+          setDeleteModalVisible={setDeleteModalVisible}
           />
       }
 
@@ -119,6 +137,14 @@ export default function FolderScreen() {
       setNewName={setNewName}
       handleNewName={handleFileEdit}
       modalTitle="Edit file name"
+      />
+
+      <DeleteConfirmModal
+      modalVisible={deleteModalVisible}
+      setModalVisible={setDeleteModalVisible}
+      onConfirm={handleFileDelete}
+      title = "Delete file"
+      fileName={pickedFile?.name}
       />
       
       <Pressable

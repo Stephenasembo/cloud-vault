@@ -66,7 +66,7 @@ export default function FileCard({
               onPress={() => {
                 menuRef.current?.measureInWindow((x, y, width, height) => {
                 openMenu({
-                name,
+                name: displayName,
                 fileId: id,
                 coordinates: {
                   x: x + width / 2,
