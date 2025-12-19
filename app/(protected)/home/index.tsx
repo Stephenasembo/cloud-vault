@@ -7,6 +7,7 @@ import { useFoldersContext } from "../../../context/FoldersContext";
 import { Folder } from "../../../types/folder";
 import InputModal from "../../../components/InputModal";
 import { useRouter } from "expo-router";
+import EmptyState from "../../../components/emptyState";
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +44,7 @@ export default function Home() {
       </View>
       : folderFetchingStatus === 'error' ?
       <Text>Ooops an error occured while fetching your folders</Text>
-      :
+      : userFolders.length > 0 ?
       <View style={styles.folderContainer}>
         <FlatList
         contentContainerStyle={styles.listContent}
@@ -58,6 +59,12 @@ export default function Home() {
         )}
         />
       </View>
+      :
+      <EmptyState
+      title='No folders yet'
+      description='Create a folder to start organizing your files securely.'
+      helperText='Folders help you group related files.'
+      />
       }
       <Pressable
       style={styles.addButton}

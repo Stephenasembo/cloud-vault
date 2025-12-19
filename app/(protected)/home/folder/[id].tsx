@@ -12,6 +12,7 @@ import InputModal from '../../../../components/InputModal';
 import { updateDisplayName } from '../../../../services/file';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import { FetchingStatusType } from '../../../../types/fetchingStatus';
+import EmptyState from '../../../../components/emptyState';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -143,9 +144,11 @@ export default function FolderScreen() {
         />
       )}
       /> :
-      <View style={{ alignItems: 'center', marginVertical: 16 }}>
-        <Text>No files uploaded yet.</Text>
-      </View>
+      <EmptyState
+      title='This folder is empty'
+      description='Upload a file to get started.'
+      helperText='Files up to 5MB are supported.'
+      />
       }
 
       {pickedFile &&
