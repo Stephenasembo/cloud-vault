@@ -13,6 +13,7 @@ import { updateDisplayName } from '../../../../services/file';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
+import Toast from 'react-native-toast-message';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -34,35 +35,48 @@ export default function FolderScreen() {
       console.log("Error updating file name: File id is null")
       return;
     }
-    const data = await updateDisplayName(newName, pickedFile.fileId)
-    if(!data) return;
-
-    const newFiles = files.map(file => file.id === data.id ? {
+    const response = await updateDisplayName(newName, pickedFile.fileId)
+    if(response.error) {
+      return Toast.show({
+        type: 'error',
+        text1: response.messageTitle
+      })
+    }
+    const newFiles = files.map(file => file.id === response.data.id ? {
       ...file,
-      metadata: {...file.metadata, display_name: data.display_name},
+      metadata: {...file.metadata, display_name: response.data.display_name},
     }: file);
 
-    console.log(files);
-    console.log(newFiles);
-
     setFiles(newFiles)
-    Alert.alert(
-      'File name updated successfully.'
-    )
+    Toast.show({
+      type: 'success',
+      text1: response.message,
+    })
   }
 
   async function handleFileDelete() {
     setMenuVisible(false);
     setDeleteModalVisible(false);
-    if (!userId || !folderId || !pickedFile) return;
-    const filePath = `public/${userId}/${folderId}/${pickedFile.name}`;
-    const status = await deleteFile(filePath);
-    if(status) {
-      Alert.alert(
-        'File deleted successfully.'
-      )
-      setFiles(prev => prev.filter(f => f.id !== pickedFile.fileId))
+    if (!userId || !folderId || !pickedFile) {
+      return Toast.show({
+        type: 'error',
+        text1: 'An error occured while deleting this folder',
+        text2: 'Please try again.'
+      })
     }
+    const filePath = `public/${userId}/${folderId}/${pickedFile.name}`;
+    const response = await deleteFile(filePath);
+    if(response.error) {
+      return Toast.show({
+        type: 'error',
+        text1: response.messageTitle,
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: response.message
+    })
+    setFiles(prev => prev.filter(f => f.id !== pickedFile.fileId))
   }
 
 
@@ -88,23 +102,37 @@ export default function FolderScreen() {
     const file = await uploadFile(userId, folderId);
     if(file.error) {
       setFileFetchingStatus('error');
-      Alert.alert(
-        file.messageTitle,
-        file.message,
-      )
+      Toast.show({
+        type: 'error',
+        text1: file.messageTitle,
+        text2: file.message,
+      })
       return
     }
-    Alert.alert(
-      'File uploaded successfully.'
-    )
+    Toast.show({
+      type: 'success',
+      text1: 'File uploaded successfully.'
+    })
     const data = await readFolderUploads(userId, folderId);
     if(!data.error) {
       setFileFetchingStatus('success');
       setFiles(data.files);
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'An error occured while fetching files.'
+      })
+      return
     }
   }
 
-  if(!userId || !folderId) return null;
+  if(!userId || !folderId) {
+    Toast.show({
+      type: 'error',
+      text1: 'An error occured while fetching files.'
+    })
+    return null
+  }
  
   return (
     <View style={styles.container}>

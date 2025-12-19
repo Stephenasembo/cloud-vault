@@ -1,4 +1,19 @@
 import { supabase } from "../lib/supabase";
+import { ErrorType } from "../types/errorType";
+
+export type FileSuccessType = {
+  error: false;
+  message: string;
+  data: FileMetadata;
+}
+
+type FileMetadata = {
+  id: string;
+  created_at: string;
+  storage_path: string;
+  display_name: string;
+  user_id: string;
+}
 
 export async function getFileDisplayName(fileId: string): Promise<string | null> {
   const { data, error } = await supabase
@@ -30,7 +45,7 @@ export async function createFileMetadata(fileId: string, userId: string, fileNam
   return data;
 }
 
-export async function updateDisplayName(newName: string, fileId: string) {
+export async function updateDisplayName(newName: string, fileId: string): Promise<FileSuccessType | ErrorType> {
   const { data, error } = await supabase
   .from('Files')
   .update({ display_name: newName })
@@ -40,8 +55,15 @@ export async function updateDisplayName(newName: string, fileId: string) {
 
   if(error) {
     console.log("An error occured while updating the file name", error)
-    return null;
+    return {
+      error: true,
+      messageTitle: 'An error occured while updating the file name',
+    };
   }
   console.log("Successfully updated the file name", data);
-  return data;
+  return {
+    error: false,
+    message: 'Successfully updated the file name',
+    data: data
+  };
 }

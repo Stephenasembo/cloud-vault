@@ -17,6 +17,11 @@ export type FileFetchSuccessType = {
   files: FileObject[];
 }
 
+export type DeleteSuccessType = {
+  error: false;
+  message: string;
+}
+
 export async function uploadFile(userId: string, folderId: string): Promise<UploadSuccessType | ErrorType> {
   const file = await pickFile();
   if(file.error) return {
@@ -88,7 +93,7 @@ export async function readFolderUploads(userId: string, folderId: string): Promi
   };
 }
 
-export async function deleteFile(filePath: string) {
+export async function deleteFile(filePath: string): Promise<DeleteSuccessType | ErrorType> {
   const { data, error } = await supabase
   .storage
   .from('cloudvault_userfiles')
@@ -96,10 +101,15 @@ export async function deleteFile(filePath: string) {
 
   if(error) {
     console.log(error);
-    return false;
+    return {
+      error: true,
+      messageTitle: 'Failed to delete file.'
+    };
   }
-  console.log("File deleted:", data);
-  return true
+  return {
+    error: false,
+    message: 'File deleted successfully.'
+  }
 }
 
 export async function shareFile(filePath: string): Promise<string | null> {
