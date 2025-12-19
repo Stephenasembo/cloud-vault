@@ -6,6 +6,7 @@ import { FileObject } from '@supabase/storage-js';
 import { PickedFileType } from '../types/pickedFile';
 import { categorizeFile } from '../utils/categorizeFile';
 import { getFileDisplayName } from '../services/file';
+import { EllipsisVertical } from 'lucide-react-native';
 
 type FileCardProps = {
   name: string
@@ -76,7 +77,7 @@ export default function FileCard({
                   y: y + height + 12,
                 },
               })})}}>
-                <Text style={styles.menuButtonText}>Menu</Text>
+                <EllipsisVertical />
               </Pressable>
             </View>
           </View>
@@ -139,8 +140,6 @@ const styles = StyleSheet.create({
   menuButton: {
     paddingHorizontal: 8,
     paddingVertical: 6,
-    borderWidth: 1,
-    borderRadius: 20,
     flexShrink: 0,
     minWidth: 48,
     minHeight: 48,

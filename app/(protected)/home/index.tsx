@@ -2,18 +2,26 @@ import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList, ActivityIndicator } from "react-native" 
 import { createFolder } from "../../../services/folder";
 import { useAuthContext } from "../../../context/AuthContext";
-import FolderCard from "../../../components/FolderCard";
+import FolderCard, { PickedFolder } from "../../../components/FolderCard";
 import { useFoldersContext } from "../../../context/FoldersContext";
 import { Folder } from "../../../types/folder";
 import InputModal from "../../../components/InputModal";
 import { useRouter } from "expo-router";
 import EmptyState from "../../../components/emptyState";
 import Toast from 'react-native-toast-message';
+import FolderMenu from "../../../components/FolderMenu";
+import DeleteConfirmModal from "../../../components/DeleteConfirmModal";
 
 export default function Home() {
+  const [folderMenuVisible, setFolderMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const { userFolders, addFolder, folderFetchingStatus } = useFoldersContext();
+  const { userFolders, addFolder, folderFetchingStatus, editUserFolder, deleteUserFolder } = useFoldersContext();
+  const [pickedFolder, setPickedFolder] = useState<PickedFolder | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
+  const [newFolderName, setNewFolderName] = useState(folderName);
+
   const router = useRouter();
 
   async function handleFolderName() {
@@ -31,8 +39,36 @@ export default function Home() {
     })
   }
 
-  function openFolder(id: string) {
-    router.navigate(`/home/folder/${id}`)
+  async function handleEdit() {
+    setEditModalVisible(false)
+    if(!pickedFolder) return;
+    const data = await editUserFolder(newFolderName, pickedFolder.id)
+    if(data.error) {
+      return Toast.show({
+        type: 'error',
+        text1: data.messageTitle,
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: data.message
+    })
+  }
+
+  async function handleDelete() {
+    setDeleteModalVisible(false);
+    if(!pickedFolder) return;
+    const data = await deleteUserFolder(pickedFolder.id);
+    if(data.error) {
+      return Toast.show({
+        type: 'error',
+        text1: data.messageTitle
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: data.message
+    })
   }
 
   return (
@@ -61,7 +97,10 @@ export default function Home() {
           <FolderCard
           folderName={item.name}
           folderId={item.id}
-          openFolder={openFolder}
+          openMenu={(pickedFolder: PickedFolder) => {
+            setFolderMenuVisible(true);
+            setPickedFolder(pickedFolder);
+          }}
           />
         )}
         />
@@ -88,6 +127,32 @@ export default function Home() {
         modalTitle="Create new folder"
         />
       </View>
+      {pickedFolder &&
+      <View>
+        <FolderMenu
+        folderId={pickedFolder.id}
+        menuVisible={folderMenuVisible}
+        setMenuVisible={setFolderMenuVisible}
+        coordinates={pickedFolder.coordinates}
+        setEditModalVisible={setEditModalVisible}
+        setDeleteModalVisible={setDeleteModalVisible}
+        />
+        <InputModal
+        modalVisible={editModalVisible}
+        setModalVisible={setEditModalVisible}
+        setNewName={setNewFolderName}
+        handleNewName={handleEdit}
+        modalTitle="Edit folder name"
+        />
+        <DeleteConfirmModal
+        modalVisible={deleteModalVisible}
+        setModalVisible={setDeleteModalVisible}
+        onConfirm={handleDelete}
+        title = "Delete folder"
+        assetName={pickedFolder.name}
+        />
+      </View>
+      }
     </View>
   )
 }

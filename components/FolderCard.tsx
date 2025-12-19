@@ -1,17 +1,24 @@
 import { Pressable, View, Text, StyleSheet, Alert } from "react-native"
 import { useFoldersContext } from "../context/FoldersContext";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import InputModal from "./InputModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import Toast from 'react-native-toast-message';
+import { EllipsisVertical } from "lucide-react-native";
+
+export type PickedFolder = {
+  id: string;
+  name: string;
+  coordinates: {x: number, y: number};
+}
 
 export type FolderCardProps = {
   folderName: string;
   folderId: string;
-  openFolder: (id: string) => void;
+  openMenu: (folder: PickedFolder) => void;  
 }
 
-export default function FolderCard ({ folderName, folderId, openFolder }: FolderCardProps) {
+export default function FolderCard ({ folderName, folderId, openMenu }: FolderCardProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [newFolderName, setNewFolderName] = useState(folderName);
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
@@ -47,6 +54,8 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
     })
   }
 
+  const menuRef = useRef<View | null>(null);
+
   return (
     <View>
       <Pressable
@@ -54,7 +63,7 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <Text>{folderName}</Text>
-          <Pressable
+          {/* <Pressable
           style={styles.button}
           onPress={() => openFolder(folderId)}
           >
@@ -71,7 +80,28 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
           onPress={() => setDeleteModalVisible(true)}
           >
             <Text>Delete</Text>
-          </Pressable>
+          </Pressable> */}
+          <View
+          ref={menuRef}
+          collapsable={false}
+          >
+            <Pressable
+            onPress={() => {
+              menuRef.current?.measureInWindow((x, y, width, height) => {
+                openMenu({
+                  name: folderName,
+                  id: folderId,
+                  coordinates: {
+                    x: x + width / 2,
+                    y: y + height,
+                  }
+                })
+              })
+            }}
+            >
+              <EllipsisVertical />
+            </Pressable>
+          </View>
         </View>
       </Pressable>
       <InputModal
