@@ -1,29 +1,49 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Link } from 'expo-router'
+import { ReactNode } from "react"
+import { ChevronRight } from "lucide-react-native"
 
 type ProfileLinkProps = {
   text: string;
   destination: string;
+  icon: ReactNode;
 }
 
-export default function ProfileLink({ text, destination }: ProfileLinkProps) {
+export default function ProfileLink({ text, destination, icon }: ProfileLinkProps) {
   return (
     <Link
-    style={styles.container}
     href={destination}
     >
-      <View>
-        <Text style={styles.linkText}>{text}</Text>
+      <View style={styles.linkContainer}>
+        <View style={styles.icon}>
+          <View>{icon}</View>
+          <Text style={styles.linkText}>{text}</Text>
+        </View>
+        <ChevronRight />
       </View>
     </Link>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 10
-  },
   linkText: {
     fontSize: 16,
-  }
+  },
+
+  linkContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+
+  icon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
 })

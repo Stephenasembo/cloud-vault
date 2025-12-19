@@ -1,11 +1,24 @@
 import { Tabs } from 'expo-router';
 import FoldersProvider from '../../providers/FoldersProvider';
+import { Home, User } from "lucide-react-native"
 
 function RootTabNavigation() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="home" options={{ tabBarLabel: "Home" }}/>
-      <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }}/>
+    <Tabs screenOptions={{
+      headerShown: false,
+      tabBarActiveTintColor: '#2563EB',
+      tabBarInactiveTintColor: '#9CA3AF',
+    }}>
+      <Tabs.Screen name="home" options={{
+        tabBarLabel: "Home",
+        tabBarIcon: ({ color, size }) => (
+        <Home color={color} size={size} />)
+      }}/>
+      <Tabs.Screen name="profile" options={{
+        tabBarLabel: "Profile",
+        tabBarIcon: ({ color, size }) => (
+        <User color={color} size={size} />)
+      }}/>
     </Tabs>
   )
 }

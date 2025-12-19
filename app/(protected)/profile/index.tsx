@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Image, Button, Alert } from "react-native" 
+import { View, Text, StyleSheet, Image, Button, Alert, Pressable } from "react-native" 
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ProfileLink from "../../../components/ProfileLink";
 import { Link } from "expo-router";
 import { supabase } from "../../../lib/supabase";
+import { FileText, HelpCircle, Settings, LogOut } from "lucide-react-native";
 
 export default function Profile() {
   async function logoutUser() {
@@ -25,19 +26,26 @@ export default function Profile() {
           <ProfileLink
           text='Terms & Conditions'
           destination='/profile/terms'
+          icon={<FileText/>}
           />
           <ProfileLink
           text='FAQ & Help'
           destination='/profile/faq'
+          icon={<HelpCircle />}
           />
           <ProfileLink
           text='Settings'
           destination='/profile/settings'
+          icon={<Settings />}
           />
-          <Button
-          title='Logout'
+          <Pressable
           onPress={logoutUser}
-          />
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
+              <Text style={{ fontSize: 16, color: 'red' }}>Logout</Text>
+              <LogOut />
+            </View>
+          </Pressable>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -53,7 +61,7 @@ const styles = StyleSheet.create({
   information: {
     backgroundColor: '#F2FDFF',
     width: '100%',
-    flex: 2,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -70,5 +78,8 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     marginVertical: 10,
+    flex: 1,
+    justifyContent: 'space-evenly',
+    paddingHorizontal: 16,
   },
 })
