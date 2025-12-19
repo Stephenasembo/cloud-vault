@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
 import AuthProvider from '../providers/AuthProvider';
 import { useAuthContext } from '../context/AuthContext';
+import Toast from 'react-native-toast-message'
 
 function RootNavigation() {
   const {isLoggedIn} = useAuthContext();
@@ -21,6 +22,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <RootNavigation />
+      <Toast />
     </AuthProvider>
   )
 }

@@ -8,6 +8,7 @@ import { Folder } from "../../../types/folder";
 import InputModal from "../../../components/InputModal";
 import { useRouter } from "expo-router";
 import EmptyState from "../../../components/emptyState";
+import Toast from 'react-native-toast-message';
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -17,11 +18,17 @@ export default function Home() {
 
   async function handleFolderName() {
     setModalVisible(false);
-    await addFolder(folderName);
-    Alert.alert(
-      'Testing supabase functions',
-      `New folder created`
-    )
+    const data = await addFolder(folderName);
+    if(data.error) {
+      return Toast.show({
+        type: 'error',
+        text1: data.messageTitle
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: data.message
+    })
   }
 
   function openFolder(id: string) {

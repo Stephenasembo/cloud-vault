@@ -3,6 +3,7 @@ import { useFoldersContext } from "../context/FoldersContext";
 import { Dispatch, SetStateAction, useState } from "react";
 import InputModal from "./InputModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import Toast from 'react-native-toast-message';
 
 export type FolderCardProps = {
   folderName: string;
@@ -18,18 +19,32 @@ export default function FolderCard ({ folderName, folderId, openFolder }: Folder
   const { deleteUserFolder, editUserFolder } = useFoldersContext();
   
   async function handleDelete() {
-    const message = await deleteUserFolder(folderId);
-    Alert.alert(
-      message
-    )
+    const data = await deleteUserFolder(folderId);
+    if(data.error) {
+      return Toast.show({
+        type: 'error',
+        text1: data.messageTitle
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: data.message
+    })
   }
 
   async function handleEdit() {
     setModalVisible(false)
-    const message = await editUserFolder(newFolderName, folderId)
-    Alert.alert(
-      message
-    )
+    const data = await editUserFolder(newFolderName, folderId)
+    if(data.error) {
+      return Toast.show({
+        type: 'error',
+        text1: data.messageTitle,
+      })
+    }
+    Toast.show({
+      type: 'success',
+      text1: data.message
+    })
   }
 
   return (

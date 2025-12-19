@@ -5,6 +5,12 @@ import { useAuthContext } from "../context/AuthContext";
 import {FoldersContext} from "../context/FoldersContext";
 import { createFolder, deleteFolder } from "../services/folder";
 import { FetchingStatusType } from "../types/fetchingStatus";
+import { ErrorType } from "../types/errorType";
+
+export type SuccessType = {
+  error: false;
+  message: string;
+}
 
 
 export default function FoldersProvider({children} : PropsWithChildren) {
@@ -27,8 +33,11 @@ export default function FoldersProvider({children} : PropsWithChildren) {
     }
   }
 
-  async function addFolder(folderName: string): Promise<void> {
-    if(!userId) return;
+  async function addFolder(folderName: string): Promise<SuccessType | ErrorType> {
+    if(!userId) return {
+      error: true,
+      messageTitle: 'Failed to add folder'
+    };
     try {
       const data = await createFolder(folderName, userId);
       if(!data) {
@@ -36,27 +45,48 @@ export default function FoldersProvider({children} : PropsWithChildren) {
       }
       setUserFolders(prev => [...prev, data]);
       refreshFolders();
+      return {
+        error: false,
+        message: 'Folder was created successfully'
+
+      }
     } catch(err) {
       console.log("Failed to add folder:", err);
+      return {
+        error: true,
+        messageTitle: "Failed to add folder"
+      }
     }
   }
 
-  async function deleteUserFolder(folderId: string): Promise<string> {
+  async function deleteUserFolder(folderId: string): Promise<SuccessType | ErrorType> {
     const status = await deleteFolder(folderId);
     if(!status) {
-      return "Failed to delete folder"
+      return {
+        error: true,
+        messageTitle: "Failed to delete folder",
+      }
     }
     await refreshFolders();
-    return "Folder deleted successfully"
+    return {
+      error: false,
+      message: "Folder deleted successfully",
+    }
   }
 
-  async function editUserFolder(newName: string, folderId: string): Promise<string> {
+  async function editUserFolder(newName: string, folderId: string): Promise<SuccessType | ErrorType> {
     const data = await updateFolder(newName, folderId)
     if(!data) {
-      return "Failed to update folder name"
+      return {
+        error: true,
+        messageTitle: "Failed to update folder name",
+      }
     }
     await refreshFolders()
-    return "Folder name updated successfully"
+    return {
+      error: false,
+      message: "Folder name updated successfully",
+    }
   }
 
   console.log("Fetsched folders:", userFolders)
