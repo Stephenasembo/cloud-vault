@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert, Pressable } from "react-native";
+import { View, Text, StyleSheet, Alert, Pressable, Share } from "react-native";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import Popover from "react-native-popover-view";
 import { FileObject } from '@supabase/storage-js';
@@ -16,6 +16,7 @@ export type MenuType = {
   coordinates: { x: number, y: number};
   setModalVisible: Dispatch<SetStateAction<boolean>>;
   setDeleteModalVisible: Dispatch<SetStateAction<boolean>>;
+  storagePath: string;
 }
 
 export default function MenuPopover({
@@ -29,35 +30,24 @@ export default function MenuPopover({
   coordinates,
   setModalVisible,
   setDeleteModalVisible,
+  storagePath,
 }: MenuType) {
 
   const point = useMemo(() => new Point(coordinates.x, coordinates.y),
   [coordinates.x, coordinates.y]);
 
-  // async function handleDelete() {
-  //   setMenuVisible(false);
-  //   const filePath = `public/${userId}/${folderId}/${name}`;
-  //   const status = await deleteFile(filePath);
-  //   if(status) {
-  //     Alert.alert(
-  //       'File deleted successfully.'
-  //     )
-  //     setFiles(prev => prev.filter(f => f.id !== fileId))
-  //   }
-  // }
-
   async function handleShare() {
     setMenuVisible(false)
-    const filePath = `public/${userId}/${folderId}/${name}`;
+    const filePath = `public/${userId}/${folderId}/${storagePath}`;
+    console.log({filePath})
     const shareLink = await shareFile(filePath);
     if(!shareLink) {
-      Alert.alert('An error occured on sharing the file.');
+      Alert.alert('Failed to create share link.');
       return
     }
-    Alert.alert(
-      'Copy This Link To Share Your Uploaded Files With Others',
-      shareLink
-    )
+    await Share.share({
+      message: `Here is a file I shared with you: \n${shareLink}`
+    });
   }
 
   async function handleRename() {

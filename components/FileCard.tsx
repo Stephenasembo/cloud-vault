@@ -16,6 +16,7 @@ type FileCardProps = {
   id: string
   openMenu: (chosenFile: PickedFileType) => void;
   fileType: string;
+  storagePath: string;
 }
 
 export default function FileCard({
@@ -27,6 +28,7 @@ export default function FileCard({
   id,
   openMenu,
   fileType,
+  storagePath,
 }: FileCardProps) {
 
   const { userId } = useAuthContext();
@@ -68,6 +70,7 @@ export default function FileCard({
                 openMenu({
                 name: displayName,
                 fileId: id,
+                storagePath: storagePath,
                 coordinates: {
                   x: x + width / 2,
                   y: y + height + 12,

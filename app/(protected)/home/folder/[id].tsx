@@ -83,8 +83,10 @@ export default function FolderScreen() {
 
   async function handleUpload(): Promise<void> {
     if(!userId) return;
+    setFileFetchingStatus('loading');
     const file = await uploadFile(userId, folderId);
     if(file.error) {
+      setFileFetchingStatus('error');
       Alert.alert(
         file.messageTitle,
         file.message,
@@ -96,6 +98,7 @@ export default function FolderScreen() {
     )
     const data = await readFolderUploads(userId, folderId);
     if(!data.error) {
+      setFileFetchingStatus('success');
       setFiles(data.files);
     }
   }
@@ -104,7 +107,9 @@ export default function FolderScreen() {
  
   return (
     <View style={styles.container}>
-      <Text>Welcome to the folder screen</Text>
+      <View style={styles.headingContainer}>
+        <Text style={styles.headingText}>Uploaded Files</Text>
+      </View>
       {fileFetchingStatus === 'loading' ? 
         <View style={{ alignItems: 'center', marginTop: 32 }}>
           <ActivityIndicator size='large' />
@@ -134,10 +139,11 @@ export default function FolderScreen() {
           setMenuVisible(true);
           setPickedFile(pickedFile)
         }}
+        storagePath={item.name}
         />
       )}
       /> :
-      <View>
+      <View style={{ alignItems: 'center', marginVertical: 16 }}>
         <Text>No files uploaded yet.</Text>
       </View>
       }
@@ -154,6 +160,7 @@ export default function FolderScreen() {
           setFiles={setFiles}
           setModalVisible={setModalVisible}
           setDeleteModalVisible={setDeleteModalVisible}
+          storagePath={pickedFile.storagePath}
           />
       }
 
@@ -187,6 +194,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+  },
+
+  headingContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+
+  headingText: {
+    fontSize: 24,
+    fontWeight: '700',
   },
 
   addButton: {
