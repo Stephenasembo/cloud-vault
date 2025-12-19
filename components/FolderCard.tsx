@@ -15,24 +15,27 @@ export type PickedFolder = {
 export type FolderCardProps = {
   folderName: string;
   folderId: string;
-  openMenu: (folder: PickedFolder) => void;  
+  openMenu: (folder: PickedFolder) => void;
+  handleOpen: () => void;
 }
 
-export default function FolderCard ({ folderName, folderId, openMenu }: FolderCardProps) {  
+export default function FolderCard ({ folderName, folderId, openMenu, handleOpen }: FolderCardProps) {  
   const menuRef = useRef<View | null>(null);
 
   return (
     <View>
       <Pressable
       style={styles.card}
+      onPress={handleOpen}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-          <Text>{folderName}</Text>
+          <Text style={styles.cardText}>{folderName}</Text>
           <View
           ref={menuRef}
           collapsable={false}
           >
             <Pressable
+            style={styles.menuButton}
             onPress={() => {
               menuRef.current?.measureInWindow((x, y, width, height) => {
                 openMenu({
@@ -40,7 +43,7 @@ export default function FolderCard ({ folderName, folderId, openMenu }: FolderCa
                   id: folderId,
                   coordinates: {
                     x: x + width / 2,
-                    y: y + height,
+                    y: y + height + 24,
                   }
                 })
               })
@@ -60,12 +63,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 12,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     width: '100%',
   },
-  button : {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 16,
+
+  cardText: {
+    fontSize: 18,
+  },
+
+  menuButton: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 })

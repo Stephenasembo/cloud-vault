@@ -101,6 +101,7 @@ export default function Home() {
             setFolderMenuVisible(true);
             setPickedFolder(pickedFolder);
           }}
+          handleOpen={() => router.navigate(`/home/folder/${item.id}`)}
           />
         )}
         />

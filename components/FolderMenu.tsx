@@ -28,11 +28,6 @@ export default function FolderMenu({
   const point = useMemo(() => new Point(coordinates.x, coordinates.y),
   [coordinates.x, coordinates.y]);
 
-  function handleOpen() {
-    setMenuVisible(false);
-    router.navigate(`/home/folder/${folderId}`)
-  }
-
   return (
     <Popover
     isVisible={menuVisible}
@@ -41,12 +36,6 @@ export default function FolderMenu({
     onRequestClose={() => setMenuVisible(false)}
     >
       <View style={styles.modalContent}>
-        <Pressable
-        style={styles.modalButton}
-        onPress={handleOpen}
-        >
-          <Text style={styles.modalButtonText}>Open</Text>
-        </Pressable>
         <Pressable
         style={styles.modalButton}
         onPress={() => {
