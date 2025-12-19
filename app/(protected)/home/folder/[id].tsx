@@ -28,6 +28,7 @@ export default function FolderScreen() {
   const [newName, setNewName] = useState('');
 
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [uploadStatus, setUploadStatus] = useState<FetchingStatusType>('idle');
 
   async function handleFileEdit() {
     setModalVisible(false)
@@ -98,24 +99,43 @@ export default function FolderScreen() {
 
   async function handleUpload(): Promise<void> {
     if(!userId) return;
-    setFileFetchingStatus('loading');
+    setUploadStatus('loading');
     const file = await uploadFile(userId, folderId);
     if(file.error) {
-      setFileFetchingStatus('error');
+      if (file.message?.includes('picking')) {
+        setUploadStatus('idle');
+        Toast.show({
+          type: 'info',
+          text1: 'File picking cancelled.'
+        })
+        return;
+      } else if (file.messageTitle.includes('large')) {
+        setUploadStatus('idle');
+        Toast.show({
+          type: 'error',
+          text1: file.messageTitle
+        })
+        Alert.alert (
+          file.messageTitle,
+          file.message
+        )
+        return;
+      }
+      setUploadStatus('error')
       Toast.show({
         type: 'error',
         text1: file.messageTitle,
         text2: file.message,
       })
-      return
+      return  
     }
+    setUploadStatus('success');
     Toast.show({
       type: 'success',
       text1: 'File uploaded successfully.'
     })
     const data = await readFolderUploads(userId, folderId);
     if(!data.error) {
-      setFileFetchingStatus('success');
       setFiles(data.files);
     } else {
       Toast.show({
@@ -151,6 +171,16 @@ export default function FolderScreen() {
       <Text>Ooops an error occured while fetching files.</Text>
       :
       files.length > 0 ?
+      uploadStatus === 'loading' ?
+      <View style={{ alignItems: 'center', marginTop: 32 }}>
+        <ActivityIndicator size='large'/>
+        <Text style={{ marginTop: 12, color: '#6B7280' }}>Uploading file</Text>
+      </View>
+      : uploadStatus === 'error' ?
+      <View>
+        <Text>An error occured while uploading this file.</Text>
+      </View>
+      :
       <FlatList
       contentContainerStyle={{ padding: 16 }}
       data={files}
