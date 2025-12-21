@@ -4,13 +4,17 @@
     "slug": "cloud-vault",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/cloudvault_icon.png",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash/light_theme.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F2F7FC",
+      "dark": {
+        "image": "./assets/splash/dark_theme.png",
+        "backgroundColor": "#0A111A"
+      }
     },
     "scheme": "your-app-scheme",
     "ios": {
