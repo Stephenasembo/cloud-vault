@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
+import { COLORS } from "./index";
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -18,18 +19,19 @@ export default function SignUp() {
         email, password
       })
 
-      if (error) console.log(error.message)
-      if (!session) Alert.alert('Please check your inbox for email verification!')
-      setLoading(false)
+      if (error) {
+        Alert.alert('Sign up failed', error.message);
+        return;
+      }
+      if (!session) Alert.alert(
+        'Check your inbox',
+        'Please verify your email to continue.'
+      )
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
-  }
-
-  async function handleSubmit() {
-    setLoading(true);
-    await signUpUser();
-    setLoading(false);
   }
 
   return (
@@ -40,8 +42,8 @@ export default function SignUp() {
       >
         <SafeAreaView style={styles.container}>
           <View style={styles.headerContainer}>
-            <Text style={styles.heading}>Sign Up</Text>
-            <Text style={styles.subHeading}>Create an account to get started</Text>
+            <Text style={styles.heading}>Create your CloudVault</Text>
+            <Text style={styles.subHeading}>Store your files securely</Text>
           </View>
           <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
@@ -49,8 +51,9 @@ export default function SignUp() {
                 <TextInput
                   style={styles.input}
                   placeholder="johndoe@gmail.com"
-                  placeholderTextColor="#A0A0A0"
-                  onChangeText={(e) => setEmail(e)}
+                  placeholderTextColor={COLORS.mutedText}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -58,16 +61,23 @@ export default function SignUp() {
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your password"
-                  placeholderTextColor="#A0A0A0"
+                  placeholderTextColor={COLORS.mutedText}
                   secureTextEntry
-                  onChangeText={(e) => setPassword(e)}
+                  onChangeText={setPassword}
                 />
             </View>
             <Pressable
-            style={styles.button}
-            onPress={handleSubmit}
+            style={({ pressed }) => [
+              styles.button,
+              loading && {opacity: 0.7},
+              pressed && styles.primaryButtonPressed
+            ]}
+            onPress={signUpUser}
+            disabled={loading}
             >
-              <Text style={styles.buttonText}>Create Account</Text>
+              <Text style={styles.buttonText}>
+                {loading ? 'Creating account...' : 'Create Account'}
+              </Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -76,10 +86,10 @@ export default function SignUp() {
   )
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
@@ -88,47 +98,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heading: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800',
-    color: '#1F2937',
+    color: COLORS.primary,
     marginBottom: 8,
   },
   subHeading: {
     fontSize: 16,
-    color: '#6B7280',
+    color: COLORS.mutedText,
   },
   formContainer: {
     width: '100%',
   },
   inputContainer: {
-    marginVertical: 10,
+    marginVertical: 16,
   },
   label: {
     fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
     marginBottom: 8,
   },
   input: {
+    backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
+    borderColor: '#D6E6F2',
+    borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    width: '100%',
+    color: COLORS.primary,
   },
   button: {
-    marginTop: 24,
+    marginTop: 20,
     borderRadius: 20,
-    paddingVertical: 15,
-    paddingHorizontal: 100,
-    borderWidth: 2,
-    textAlign: 'center',
-    backgroundColor: '#BDC2BF',
-    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    borderColor: '#D6E6F2',
+    backgroundColor: COLORS.primary,
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
+  },
+  primaryButtonPressed: {
+    transform: [{ scale: 0.9 }],
+    shadowOpacity: 0.1,
+    elevation: 2,
   },
 })
