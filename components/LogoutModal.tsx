@@ -8,21 +8,17 @@ import {
 import { Dispatch, SetStateAction } from "react";
 import { COLORS } from "../app/(auth)";
 
-export type DeleteConfirmModalProps = {
+export type LogoutModalProps = {
   modalVisible: boolean;
   setModalVisible: Dispatch<SetStateAction<boolean>>;
   onConfirm: () => Promise<void>;
-  title: string;
-  assetName?: string;
 };
 
-export default function DeleteConfirmModal({
+export default function LogoutModal({
   modalVisible,
   setModalVisible,
   onConfirm,
-  title,
-  assetName,
-}: DeleteConfirmModalProps) {
+}: LogoutModalProps) {
   return (
     <Modal
       visible={modalVisible}
@@ -37,11 +33,9 @@ export default function DeleteConfirmModal({
         />
 
         <View style={styles.modalCard}>
-          <Text style={styles.modalTitle}>{title}</Text>
+          <Text style={styles.modalTitle}>Log out?</Text>
           <Text style={styles.modalDescription}>
-            Are you sure you want to delete{' '}
-            <Text style={{ fontWeight: '600'}}>{assetName}</Text>?
-            {'\n'}This action cannot be undone
+            You will need to sign in again to access your files.
           </Text>
 
           <View style={styles.modalButtons}>
@@ -54,9 +48,9 @@ export default function DeleteConfirmModal({
 
             <Pressable
               onPress={onConfirm}
-              style={styles.deleteButton}
+              style={styles.logoutButton}
             >
-              <Text style={styles.deleteText}>Delete</Text>
+              <Text style={styles.logoutText}>Logout</Text>
             </Pressable>
           </View>
         </View>
@@ -116,14 +110,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
 
-  deleteButton: {
+  logoutButton: {
     backgroundColor: '#e53935',
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 18,
   },
 
-  deleteText: {
+  logoutText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 15,

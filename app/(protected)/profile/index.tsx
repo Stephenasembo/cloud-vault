@@ -4,8 +4,12 @@ import ProfileLink from "../../../components/ProfileLink";
 import { Link } from "expo-router";
 import { supabase } from "../../../lib/supabase";
 import { FileText, HelpCircle, Settings, LogOut } from "lucide-react-native";
+import { COLORS } from "../../(auth)";
+import LogoutModal from "../../../components/LogoutModal";
+import { useState } from "react";
 
 export default function Profile() {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   async function logoutUser() {
     const { error } = await supabase.auth.signOut()
     if (error) console.log(`Error on signing out: ${error}`)
@@ -15,13 +19,9 @@ export default function Profile() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <View style={styles.information}>
-          <Image
-          source={require('../../../assets/avatar.png')}
-          style={styles.avatar}
-          />
-          <Text style={styles.avatarText}>John Doe</Text>
-        </View>
+
+        <Text style={styles.sectionTitle}>Account</Text>
+
         <View style={styles.linksContainer}>
           <ProfileLink
           text='Terms & Conditions'
@@ -39,14 +39,19 @@ export default function Profile() {
           icon={<Settings />}
           />
           <Pressable
-          onPress={logoutUser}
+          onPress={() => setModalVisible(true)}
           >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
-              <Text style={{ fontSize: 16, color: 'red' }}>Logout</Text>
+              <Text style={{ fontSize: 18, color: 'red', fontWeight: '500' }}>Logout</Text>
               <LogOut />
             </View>
           </Pressable>
         </View>
+        <LogoutModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onConfirm={logoutUser}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   )
@@ -55,27 +60,18 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 16,
   },
-  information: {
-    backgroundColor: '#F2FDFF',
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  avatar: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-  },
-  avatarText: {
+
+  sectionTitle: {
     textAlign: 'center',
-    marginTop: 10,
-    fontWeight: 700,
+    marginVertical: 20,
+    fontWeight: '600',
     fontSize: 24,
+    color: COLORS.primary,
   },
+  
   linksContainer: {
     marginVertical: 10,
     flex: 1,

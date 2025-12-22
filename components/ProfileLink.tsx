@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Link } from 'expo-router'
 import { ReactNode } from "react"
-import { ChevronRight } from "lucide-react-native"
+import { ChevronRight } from "lucide-react-native";
+import { COLORS } from "../app/(auth)";
 
 type ProfileLinkProps = {
   text: string;
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: COLORS.border,
   },
 
   icon: {
