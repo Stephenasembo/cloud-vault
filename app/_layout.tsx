@@ -12,7 +12,7 @@ function RootNavigation() {
         <Stack.Screen name='(auth)' options={{ headerShown: false}}/>
       </Stack.Protected>
       <Stack.Protected guard={!!isLoggedIn}>
-        <Stack.Screen name='(protected)' options={{ title: 'Cloud Vault'}}/>
+        <Stack.Screen name='(protected)' options={{headerShown: false}}/>
       </Stack.Protected>
     </Stack>
   )

@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, Pressable, Alert, FlatList, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { readFolderUploads, uploadFile, deleteFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { FileObject } from '@supabase/storage-js';
 import FileCard from '../../../../components/FileCard';
 import { useFoldersContext } from '../../../../context/FoldersContext';
@@ -18,7 +18,15 @@ import { COLORS } from '../../../(auth)';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
-  const { id: folderId } = useLocalSearchParams<{ id: string }>();
+  const { id: folderId , folderName } = useLocalSearchParams<{ id: string, folderName: string }>();
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: folderName || 'Folder',
+      headerTitleAlign: 'center',
+    })
+  }, [folderName])
 
   const [ files, setFiles] = useState<FileObject[] | []>([]);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);

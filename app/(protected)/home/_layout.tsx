@@ -2,8 +2,11 @@ import { Stack } from "expo-router";
 
 export default function HomeScreenNavigation() {
   return (
-    <Stack screenOptions={{ headerShown: false}}>
-      <Stack.Screen name="index"/>
+    <Stack>
+      <Stack.Screen name="index" options={{
+        headerTitle: 'CloudVault',
+        headerTitleAlign: 'center',
+        }}/>
       <Stack.Screen name="folder"/>
     </Stack>
   )
