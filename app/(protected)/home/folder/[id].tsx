@@ -14,6 +14,7 @@ import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
 import Toast from 'react-native-toast-message';
+import { COLORS } from '../../../(auth)';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -254,18 +255,18 @@ export default function FolderScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: COLORS.background,
   },
 
   headingContainer: {
+    padding: 16,
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 12,
   },
 
   headingText: {
     fontSize: 24,
     fontWeight: '700',
+    color: COLORS.primary,
   },
 
   addButton: {
@@ -275,14 +276,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'gray',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+
+    elevation: 6,
   },
 
   addButtonText: {
-    fontSize: 44,
-    color: 'white'
+    fontSize: 32,
+    color: 'white',
+    fontWeight: '400',
   },
 
 })

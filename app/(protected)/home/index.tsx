@@ -11,6 +11,7 @@ import EmptyState from "../../../components/emptyState";
 import Toast from 'react-native-toast-message';
 import FolderMenu from "../../../components/FolderMenu";
 import DeleteConfirmModal from "../../../components/DeleteConfirmModal";
+import { COLORS } from "../../(auth)";
 
 export default function Home() {
   const [folderMenuVisible, setFolderMenuVisible] = useState(false);
@@ -161,18 +162,18 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: COLORS.background,
   },
 
   headingContainer: {
-    marginVertical: 16,
-    justifyContent: 'flex-start'
+    padding: 16,
+    alignItems: 'center',
   },
 
   heading: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '800',
+    color: COLORS.primary,
   },
 
   folderContainer: {
@@ -183,6 +184,7 @@ const styles = StyleSheet.create({
 
   listContent: {
     paddingHorizontal: 16,
+    paddingBottom: 120,
   },
 
   addButton: {
@@ -192,14 +194,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'blue',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+
+    elevation: 6,
   },
 
   addButtonText: {
-    fontSize: 44,
-    color: 'white'
+    fontSize: 32,
+    color: 'white',
+    fontWeight: '400',
   },
 
   button: {

@@ -94,37 +94,34 @@ export default function FileCard({
 
 const styles = StyleSheet.create({
   card: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 10,
+    borderRadius: 14,
+    marginBottom: 12,
+
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 10,
-    borderWidth: 1,
-    width: '100%',
+    shadowRadius: 6,
+
+    elevation: 3,
   },
 
   infoContainer: {
     flex: 1,
-    justifyContent: 'center',
   },
 
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
 
   fileName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#111827',
-    marginBottom: 2,
-    flexShrink: 1,
   },
 
   metaDataContainer: {

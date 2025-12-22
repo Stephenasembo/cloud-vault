@@ -70,7 +70,9 @@ export const COLORS = {
   background: "#EEF7FF",
   primary: "#3A5874",
   secondary: "#6FAED9",
-  mutedText: "#6B8AA4"
+  mutedText: "#6B8AA4",
+  border: "#D6E6F2",
+  textSecondary: '#6B7280',
 }
 
 const styles = StyleSheet.create({

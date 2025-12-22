@@ -5,6 +5,7 @@ import { FileObject } from '@supabase/storage-js';
 import { deleteFile, shareFile } from "../services/storage";
 import { Placement, Point } from 'react-native-popover-view/dist/Types'
 import { useRouter } from "expo-router";
+import { COLORS } from "../app/(auth)";
 
 export type FolderMenuType = {
   folderId: string;
@@ -61,13 +62,11 @@ export default function FolderMenu({
 
 const styles = StyleSheet.create({
   modalContent: {
-    borderWidth: 1,
     backgroundColor: 'white',
     minWidth: 160,
     elevation: 8,
     paddingVertical: 12,
-    paddingHorizontal: 6,
-    borderRadius: 12,
+    borderRadius: 14,
 
     shadowColor: '#000',
     shadowOpacity: 0.15,
@@ -77,9 +76,9 @@ const styles = StyleSheet.create({
 
   modalButton: {
     borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     fontSize: 16,
     margin: 8,
     alignItems: 'center',
@@ -88,11 +87,11 @@ const styles = StyleSheet.create({
 
   modalButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#111827',
+    color: COLORS.primary,
   },
 
   deleteText: {
     color: '#DC2626',
+    fontWeight: '500',
   },
 })

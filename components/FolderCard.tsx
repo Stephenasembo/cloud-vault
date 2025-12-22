@@ -5,6 +5,7 @@ import InputModal from "./InputModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import Toast from 'react-native-toast-message';
 import { EllipsisVertical } from "lucide-react-native";
+import { COLORS } from "../app/(auth)";
 
 export type PickedFolder = {
   id: string;
@@ -49,7 +50,7 @@ export default function FolderCard ({ folderName, folderId, openMenu, handleOpen
               })
             }}
             >
-              <EllipsisVertical />
+              <EllipsisVertical color='#6B7280'/>
             </Pressable>
           </View>
         </View>
@@ -60,15 +61,24 @@ export default function FolderCard ({ folderName, folderId, openMenu, handleOpen
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 2,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    width: '100%',
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+    backgroundColor: 'white',
+    borderColor: COLORS.border,
+
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+
+    elevation: 6,
   },
 
   cardText: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 
   menuButton: {

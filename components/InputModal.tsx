@@ -9,6 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import { Dispatch, SetStateAction } from "react";
+import { COLORS } from "../app/(auth)/index"
 
 export type InputModalProps = {
   modalVisible: boolean;
@@ -53,15 +54,15 @@ export default function InputModal({
         <View style={styles.modalButtons}>
           <Pressable
           onPress={() => setModalVisible(false)}
-          style={styles.modalButton}
+          style={styles.cancelButton}
           >
-            <Text>Cancel</Text>
+            <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>
           <Pressable
           onPress={handleNewName}
-          style={styles.modalButton}
+          style={styles.saveButton}
           >
-            <Text>Save</Text>
+            <Text style={styles.saveText}>Save</Text>
           </Pressable>
         </View>
       </View>
@@ -81,8 +82,13 @@ const styles = StyleSheet.create({
     width: "85%",
     backgroundColor: "white",
     padding: 20,
-    borderRadius: 16,
-    elevation: 5,
+    borderRadius: 20,
+    elevation: 8,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
 
   backdrop: {
@@ -91,18 +97,23 @@ const styles = StyleSheet.create({
   },
 
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
-    marginBottom: 16,
+    marginBottom: 24,
     textAlign: 'center',
+    color: COLORS.primary,
   },
 
   input: {
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 24,
+    color: COLORS.primary,
+    fontSize: 16,
   },
 
   modalButtons: {
@@ -111,11 +122,28 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
 
-  modalButton: {
-    borderWidth: 1,
-    paddingVertical: 8,
+  cancelButton: {
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 12,
-    fontSize: 16,
+    borderWidth: 1,
+  },
+
+  saveButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+  },
+
+  cancelText: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+  },
+
+  saveText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "white",
   },
 })
