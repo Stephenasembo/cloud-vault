@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "cloud-vault",
-    "slug": "cloud-vault",
+    "name": "CloudVault",
+    "slug": "CloudVault",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/cloudvault_icon.png",
@@ -9,7 +9,7 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash/light_theme.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#F2F7FC",
       "dark": {
         "image": "./assets/splash/dark_theme.png",
@@ -22,17 +22,24 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/cloudvault_icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.stephenasembo.cloudvault"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "53bf95ae-550f-45d4-9ac6-a41419d6bc90"
+      }
+    }
   }
 }
