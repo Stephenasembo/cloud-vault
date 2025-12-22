@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CloudVault",
-    "slug": "CloudVault",
+    "slug": "cloud-vault",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/cloudvault_icon.png",
