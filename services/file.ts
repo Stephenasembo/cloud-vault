@@ -67,3 +67,16 @@ export async function updateDisplayName(newName: string, fileId: string): Promis
     data: data
   };
 }
+
+export async function deleteFileMetadata(fileId: string): Promise<boolean> {
+  const { error } = await supabase
+  .from('Files')
+  .delete()
+  .eq('id', fileId)
+
+  if(error) {
+    console.log("Error occured on deleting file", error)
+    return false;
+  }
+  return true;
+}

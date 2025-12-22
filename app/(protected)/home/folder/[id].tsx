@@ -74,8 +74,8 @@ export default function FolderScreen() {
         text2: 'Please try again.'
       })
     }
-    const filePath = `public/${userId}/${folderId}/${pickedFile.name}`;
-    const response = await deleteFile(filePath);
+    const filePath = `public/${userId}/${folderId}/${pickedFile.storagePath}`;
+    const response = await deleteFile(filePath, pickedFile.fileId);
     if(response.error) {
       return Toast.show({
         type: 'error',

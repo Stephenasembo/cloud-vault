@@ -2,7 +2,7 @@ import { decode } from 'base64-arraybuffer'
 import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
 import { FileObject } from '@supabase/storage-js'
-import { createFileMetadata } from './file'
+import { createFileMetadata, deleteFileMetadata } from './file'
 import { ErrorType, FilePickSuccess } from '../utils/filePicker'
 
 export type UploadSuccessType = {
@@ -93,11 +93,12 @@ export async function readFolderUploads(userId: string, folderId: string): Promi
   };
 }
 
-export async function deleteFile(filePath: string): Promise<DeleteSuccessType | ErrorType> {
+export async function deleteFile(filePath: string, fileId: string): Promise<DeleteSuccessType | ErrorType> {
+  console.log(filePath);
   const { data, error } = await supabase
   .storage
   .from('cloudvault_userfiles')
-  .remove([`${filePath}`])
+  .remove([filePath])
 
   if(error) {
     console.log(error);
@@ -106,6 +107,16 @@ export async function deleteFile(filePath: string): Promise<DeleteSuccessType | 
       messageTitle: 'Failed to delete file.'
     };
   }
+
+  const response = await deleteFileMetadata(fileId)
+
+  if(!response) {
+    return {
+      error: true,
+      messageTitle: 'Failed to delete file.'
+    }
+  }
+
   return {
     error: false,
     message: 'File deleted successfully.'
