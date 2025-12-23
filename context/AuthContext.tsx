@@ -5,7 +5,6 @@ export type AuthStatusType = 'unknown' | 'authenticated' | 'unauthenticated';
 
 export type AuthData = {
   session?: Session | null;
-  isLoading: boolean;
   isLoggedIn: boolean;
   userId: string | null;
   authStatus: AuthStatusType;
@@ -13,7 +12,6 @@ export type AuthData = {
 
 export const AuthContext = createContext<AuthData>({
   session: null,
-  isLoading: false,
   isLoggedIn: false,
   userId: null,
   authStatus: 'unknown',
