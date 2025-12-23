@@ -4,13 +4,22 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
 import { COLORS } from "./index";
 import { styles } from "./signup";
+import { useDeviceContext } from "../../context/DeviceContext";
 
 export default function Login() {
+  const { networkStatus } = useDeviceContext();  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function loginUser() {
+    if(networkStatus === 'offline') {
+      Alert.alert(
+        'No internet connection',
+        'Please connect to the internet to login.'
+      );
+      return;
+    }
     try{
       setLoading(true);
       const {
@@ -42,6 +51,11 @@ export default function Login() {
             <Text style={styles.heading}>Welcome back</Text>
             <Text style={styles.subHeading}>Sign in to your CloudVault</Text>
           </View>
+          {networkStatus === 'offline' && (
+            <View style={styles.networkInfoContainer}>
+              <Text style={styles.networkInfoText}>You are offline. Please connect to the internet to sign in.</Text>
+            </View>
+          )}
           <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Email</Text>
@@ -66,13 +80,15 @@ export default function Login() {
             style={({ pressed }) => [
               styles.button,
               loading && {opacity: 0.7},
+              networkStatus === 'offline' && {opacity: 0.7},
               pressed && styles.primaryButtonPressed
             ]}
             onPress={loginUser}
-            disabled={loading}
+            disabled={networkStatus === 'offline' || loading}
             >
               <Text style={styles.buttonText}>
-                {loading ? 'Logging you in...' : 'Login'}
+                {networkStatus === 'offline' ? 'You are offline' :
+                loading ? 'Logging you in...' : 'Login'}
               </Text>
             </Pressable>
           </View>
@@ -81,61 +97,3 @@ export default function Login() {
     </SafeAreaProvider>
   )
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#F9FAFB',
-//     justifyContent: 'center',
-//     paddingHorizontal: 20,
-//   },
-//   headerContainer: {
-//     marginBottom: 40,
-//     alignItems: 'center',
-//   },
-//   heading: {
-//     fontSize: 32,
-//     fontWeight: '800',
-//     color: '#1F2937',
-//     marginBottom: 8,
-//   },
-//   subHeading: {
-//     fontSize: 16,
-//     color: '#6B7280',
-//   },
-//   formContainer: {
-//     width: '100%',
-//   },
-//   inputContainer: {
-//     marginVertical: 10,
-//   },
-//   label: {
-//     fontSize: 16,
-//     marginBottom: 8,
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: '#E5E7EB',
-//     borderRadius: 12,
-//     paddingHorizontal: 16,
-//     paddingVertical: 14,
-//     fontSize: 16,
-//     width: '100%',
-//   },
-//   button: {
-//     marginTop: 24,
-//     borderRadius: 20,
-//     paddingVertical: 15,
-//     paddingHorizontal: 100,
-//     borderWidth: 2,
-//     textAlign: 'center',
-//     backgroundColor: '#BDC2BF',
-//     width: '100%',
-//   },
-//   buttonText: {
-//     color: 'white',
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//   },
-// })

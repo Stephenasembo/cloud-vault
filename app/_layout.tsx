@@ -4,6 +4,7 @@ import { useAuthContext } from '../context/AuthContext';
 import Toast from 'react-native-toast-message'
 import AppProvider from '../providers/AppProvider';
 import { useAppContext } from '../context/AppContext';
+import DeviceProvider from '../providers/DeviceProvider';
 
 function RootNavigation() {
   const { authStatus } = useAuthContext();
@@ -25,11 +26,13 @@ function RootNavigation() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <RootNavigation />
-        <Toast />
-      </AppProvider>
-    </AuthProvider>
+    <DeviceProvider>
+      <AuthProvider>
+        <AppProvider>
+          <RootNavigation />
+          <Toast />
+        </AppProvider>
+      </AuthProvider>
+    </DeviceProvider>
   )
 }

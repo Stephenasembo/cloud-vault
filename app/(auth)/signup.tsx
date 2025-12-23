@@ -3,13 +3,22 @@ import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Pla
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
 import { COLORS } from "./index";
+import { useDeviceContext } from "../../context/DeviceContext";
 
 export default function SignUp() {
+  const { networkStatus } = useDeviceContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function signUpUser() {
+    if(networkStatus === 'offline') {
+      Alert.alert(
+        'No internet connection',
+        'Please connect to the internet to sign up.'
+      );
+      return;
+    }
     try{
       setLoading(true);
       const {
@@ -45,6 +54,11 @@ export default function SignUp() {
             <Text style={styles.heading}>Create your CloudVault</Text>
             <Text style={styles.subHeading}>Store your files securely</Text>
           </View>
+          {networkStatus === 'offline' && (
+            <View style={styles.networkInfoContainer}>
+              <Text style={styles.networkInfoText}>You are offline. Please connect to the internet to sign up.</Text>
+            </View>
+          )}
           <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Email</Text>
@@ -70,13 +84,15 @@ export default function SignUp() {
             style={({ pressed }) => [
               styles.button,
               loading && {opacity: 0.7},
+              networkStatus === 'offline' && {opacity: 0.7},
               pressed && styles.primaryButtonPressed
             ]}
             onPress={signUpUser}
-            disabled={loading}
+            disabled={networkStatus === 'offline' || loading}
             >
               <Text style={styles.buttonText}>
-                {loading ? 'Creating account...' : 'Create Account'}
+                {networkStatus === 'offline' ? 'You are offline' :
+                loading ? 'Creating account...' : 'Create Account'}
               </Text>
             </Pressable>
           </View>
@@ -106,6 +122,15 @@ export const styles = StyleSheet.create({
   subHeading: {
     fontSize: 16,
     color: COLORS.mutedText,
+  },
+  networkInfoContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  networkInfoText: {
+    color: COLORS.mutedText,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   formContainer: {
     width: '100%',
