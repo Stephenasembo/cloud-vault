@@ -77,3 +77,14 @@ export async function removeFolderCache(folderId: string) {
     }
   }
 }
+
+export async function syncFoldersCache(folders: Folder[]) {
+  const folderIds = folders.map((folder) => folder.id);
+  await AsyncStorage.setItem(STORAGE_KEYS.FOLDER_INDEX, JSON.stringify(folderIds));
+  await Promise.all(
+    folders.map((folder: Folder) => {
+      const folderKey = `${STORAGE_KEYS.FOLDERS}:${folder.id}`;
+      return AsyncStorage.setItem(folderKey, JSON.stringify(folder));
+    })
+  )
+}
