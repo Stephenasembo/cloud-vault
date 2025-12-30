@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Folder, SuccessStorageType } from './types';
+import { SuccessStorageType } from './types';
+import { Folder } from '../types/folder';
 import { ErrorType } from '../types/errorType';
 import { STORAGE_KEYS } from './keys';
 import { addIndex } from './cache';
@@ -45,4 +46,16 @@ export async function readFolderCache(folderId: string): Promise<ErrorType | Suc
       messageTitle: 'Error on retrieving cached folder data.'
     }
   }
+}
+
+export async function readAllFoldersCache(): Promise<Folder[]> {
+  const storedIndex = await AsyncStorage.getItem(STORAGE_KEYS.FOLDER_INDEX);
+  if(!storedIndex) return [];
+  const idArray = JSON.parse(storedIndex);
+  const folderArray: (Folder | null)[] = await Promise.all(idArray.map(async (id: string) => {
+    const response = await readFolderCache(id);
+    if(response.error) return null;
+    return response.data;
+  }));
+  return folderArray.filter((folder) => folder !== null)
 }

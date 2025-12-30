@@ -46,3 +46,16 @@ export async function readFileCache(fileId: string): Promise<ErrorType | Success
     }
   }
 }
+
+export async function readAllFilesCache() {
+  const storedIndex = await AsyncStorage.getItem(STORAGE_KEYS.FILE_INDEX);
+  if(!storedIndex) return [];
+  const idArray = JSON.parse(storedIndex);
+  const fileArray: (File | null)[] = await Promise.all(idArray.map(async (id: string) => {
+    const response = await readFileCache(id);
+    if(response.error) return null;
+    return response.data;
+  }));
+  return fileArray.filter((file) => file !== null)
+
+}
