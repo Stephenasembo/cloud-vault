@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList, ActivityIndicator } from "react-native" 
+import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList, ActivityIndicator, RefreshControl } from "react-native" 
 import { createFolder } from "../../../services/folder";
 import { useAuthContext } from "../../../context/AuthContext";
 import FolderCard, { PickedFolder } from "../../../components/FolderCard";
@@ -12,16 +12,19 @@ import Toast from 'react-native-toast-message';
 import FolderMenu from "../../../components/FolderMenu";
 import DeleteConfirmModal from "../../../components/DeleteConfirmModal";
 import { COLORS } from "../../(auth)";
+import { useDeviceContext } from "../../../context/DeviceContext";
 
 export default function Home() {
   const [folderMenuVisible, setFolderMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const { userFolders, addFolder, folderFetchingStatus, editUserFolder, deleteUserFolder } = useFoldersContext();
+  const { userFolders, addFolder, folderFetchingStatus, editUserFolder, deleteUserFolder, refreshFolders } = useFoldersContext();
   const [pickedFolder, setPickedFolder] = useState<PickedFolder | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
   const [newFolderName, setNewFolderName] = useState(folderName);
+  const [refreshing, setRefreshing] = useState(false);
+  const { networkStatus } = useDeviceContext();
 
   const router = useRouter();
 
@@ -72,6 +75,20 @@ export default function Home() {
     })
   }
 
+  async function handleRefresh() {
+    setRefreshing(true)
+    if(networkStatus === 'offline') {
+      Toast.show({
+        type: 'error',
+        text1: 'Please connect to the internet to refresh app.'
+      })
+      setRefreshing(false);
+      return;
+    }
+    await refreshFolders()
+    setRefreshing(false);
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.headingContainer}>
@@ -93,6 +110,9 @@ export default function Home() {
         <FlatList
         contentContainerStyle={styles.listContent}
         data={userFolders}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
+        }
         keyExtractor={(item: Folder) => item.id}
         renderItem={({item}) => (
           <FolderCard

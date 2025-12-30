@@ -23,6 +23,53 @@ export default function FoldersProvider({children} : PropsWithChildren) {
   const [folderFetchingStatus, setFolderFetchingStatus] = useState<FetchingStatusType>('idle');
   const { networkStatus } = useDeviceContext();
 
+  async function processFolderQueue() {
+    const queue = await readMutationQueue();
+    if(queue.length === 0) return;
+
+    for (const mutation of queue) {
+      try {
+        switch (mutation.type) {
+          case 'ADD_FOLDER': {
+            const createdFolder = await createFolder(mutation.payload.name, userId);
+
+            if(!createdFolder) throw new Error();
+
+            await dequeueMutation(mutation);
+            await removeFolderCache(mutation.tempId);
+            await cacheFolder(createdFolder.id, createdFolder);
+
+            break;
+          }
+
+          case 'UPDATE_FOLDER': {
+            const updatedFolder = await updateFolder(mutation.payload.name, mutation.folderId);
+
+            if(!updatedFolder) throw new Error();
+
+            await dequeueMutation(mutation);
+            await cacheFolder(updatedFolder.id, updatedFolder);
+
+            break;
+          }
+
+          case 'DELETE_FOLDER': {
+            const deleteStatus = await deleteFolder(mutation.folderId);
+
+            if(!deleteStatus) throw new Error();
+
+            await dequeueMutation(mutation);
+
+            break;
+          }
+        }
+      } catch (e) {
+        console.log(e);
+        return
+      }
+    }
+  }
+
   async function refreshFolders(): Promise<void> {
     // Read from cache
     const cachedFolders = await readAllFoldersCache();
@@ -36,6 +83,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
       if (!userId) return;
       setFolderFetchingStatus('loading')
       try {
+        await processFolderQueue();
         const data = await getFolders(userId);
         if(data) {
           setFolderFetchingStatus('success');
@@ -191,60 +239,9 @@ export default function FoldersProvider({children} : PropsWithChildren) {
     }
   }
 
-  async function processFolderQueue() {
-  const queue = await readMutationQueue();
-  if(queue.length === 0) return;
-
-  for (const mutation of queue) {
-    try {
-      switch (mutation.type) {
-        case 'ADD_FOLDER': {
-          const createdFolder = await createFolder(mutation.payload.name, userId);
-
-          if(!createdFolder) throw new Error();
-
-          await dequeueMutation(mutation);
-          await removeFolderCache(mutation.tempId);
-          await cacheFolder(createdFolder.id, createdFolder);
-
-          break;
-        }
-
-        case 'UPDATE_FOLDER': {
-          const updatedFolder = await updateFolder(mutation.payload.name, mutation.folderId);
-
-          if(!updatedFolder) throw new Error();
-
-          await dequeueMutation(mutation);
-          await cacheFolder(updatedFolder.id, updatedFolder);
-
-          break;
-        }
-
-        case 'DELETE_FOLDER': {
-          const deleteStatus = await deleteFolder(mutation.folderId);
-
-          if(!deleteStatus) throw new Error();
-
-          await dequeueMutation(mutation);
-
-          break;
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      return
-    }
-  }
-}
-
   console.log("Fetched folders:", userFolders)
   useEffect(() => {
-    async function refreshAppFolders() {
-      await processFolderQueue();
-      await refreshFolders();
-    }
-    refreshAppFolders();
+    refreshFolders();
   }, [userId])
 
   return (
