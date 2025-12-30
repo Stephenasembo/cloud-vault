@@ -6,6 +6,7 @@ import {FoldersContext} from "../context/FoldersContext";
 import { createFolder, deleteFolder } from "../services/folder";
 import { FetchingStatusType } from "../types/fetchingStatus";
 import { ErrorType } from "../types/errorType";
+import { cacheFolder, readAllFoldersCache, removeFolderCache, syncFoldersCache } from "../storage/folder";
 
 export type SuccessType = {
   error: false;
@@ -19,6 +20,14 @@ export default function FoldersProvider({children} : PropsWithChildren) {
   const [folderFetchingStatus, setFolderFetchingStatus] = useState<FetchingStatusType>('idle');
 
   async function refreshFolders(): Promise<void> {
+    // Read from cache
+    const cachedFolders = await readAllFoldersCache();
+    if(cachedFolders.length > 0) {
+      setUserFolders(cachedFolders);
+      setFolderFetchingStatus('success');
+    }
+
+    // Read from backend
     if (!userId) return;
     setFolderFetchingStatus('loading')
     try {
@@ -26,6 +35,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
       if(data) {
         setFolderFetchingStatus('success');
         setUserFolders(data);
+        await syncFoldersCache(data);
       }
     } catch (err) {
       setFolderFetchingStatus('error')
@@ -43,8 +53,11 @@ export default function FoldersProvider({children} : PropsWithChildren) {
       if(!data) {
         throw new Error("Folder was not created");
       }
+
+      // Update cache
+      await cacheFolder(data.id, data);
+
       setUserFolders(prev => [...prev, data]);
-      refreshFolders();
       return {
         error: false,
         message: 'Folder was created successfully'
@@ -67,7 +80,8 @@ export default function FoldersProvider({children} : PropsWithChildren) {
         messageTitle: "Failed to delete folder",
       }
     }
-    await refreshFolders();
+    await removeFolderCache(folderId);
+    setUserFolders(prev => prev.filter((folder) => folder.id !== folderId));
     return {
       error: false,
       message: "Folder deleted successfully",
@@ -82,14 +96,18 @@ export default function FoldersProvider({children} : PropsWithChildren) {
         messageTitle: "Failed to update folder name",
       }
     }
-    await refreshFolders()
+
+    await cacheFolder(folderId, data);
+    setUserFolders(prev => (
+      prev.map((folder) => folder.id === folderId ? data : folder)
+    ))
     return {
       error: false,
       message: "Folder name updated successfully",
     }
   }
 
-  console.log("Fetsched folders:", userFolders)
+  console.log("Fetched folders:", userFolders)
   useEffect(() => {
     refreshFolders()
   }, [userId])
