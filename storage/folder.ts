@@ -3,7 +3,7 @@ import { SuccessStorageType } from './types';
 import { Folder } from '../types/folder';
 import { ErrorType } from '../types/errorType';
 import { STORAGE_KEYS } from './keys';
-import { addIndex } from './cache';
+import { addIndex, removeIndex } from './cache';
 
 export async function cacheFolder(folderId: string, folderData: Folder): Promise<ErrorType | SuccessStorageType> {
   try {
@@ -58,4 +58,22 @@ export async function readAllFoldersCache(): Promise<Folder[]> {
     return response.data;
   }));
   return folderArray.filter((folder) => folder !== null)
+}
+
+export async function removeFolderCache(folderId: string) {
+  try {
+    const folderKey = `${STORAGE_KEYS.FOLDERS}:${folderId}`;
+    await AsyncStorage.removeItem(folderKey);
+    await removeIndex(STORAGE_KEYS.FOLDER_INDEX, folderId);
+    return {
+      error: false,
+      message: 'Successfully removed folder cache.'
+    }
+  } catch (e) {
+    console.log(e);
+    return {
+      error: true,
+      messageTitle: 'Error on removing cached folder.'
+    }
+  }
 }

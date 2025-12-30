@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { File, SuccessStorageType } from './types';
 import { ErrorType } from '../types/errorType';
 import { STORAGE_KEYS } from './keys';
-import { addIndex } from './cache';
+import { addIndex, removeIndex } from './cache';
 
 export async function cacheFile(fileId: string, fileData: File): Promise<ErrorType | SuccessStorageType> {
   try{
@@ -58,4 +58,22 @@ export async function readAllFilesCache() {
   }));
   return fileArray.filter((file) => file !== null)
 
+}
+
+export async function removeFileCache(fileId: string) {
+  try {
+    const fileKey = `${STORAGE_KEYS.FILES}:${fileId}`;
+    await AsyncStorage.removeItem(fileKey);
+    await removeIndex(STORAGE_KEYS.FILE_INDEX, fileId);
+    return {
+      error: false,
+      message: 'Successfully removed file cache.'
+    }
+  } catch (e) {
+    console.log(e);
+    return {
+      error: true,
+      messageTitle: 'Error on removing cached file.'
+    }
+  }
 }
