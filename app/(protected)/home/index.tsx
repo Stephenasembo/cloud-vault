@@ -105,7 +105,7 @@ export default function Home() {
       </View>
       : folderFetchingStatus === 'error' ?
       <Text>Ooops an error occured while fetching your folders</Text>
-      : userFolders.length > 0 ?
+      :
       <View style={styles.folderContainer}>
         <FlatList
         contentContainerStyle={styles.listContent}
@@ -127,14 +127,15 @@ export default function Home() {
             params: {folderName: item.name}})}
           />
         )}
+        ListEmptyComponent={
+          <EmptyState
+          title='No folders yet'
+          description='Create a folder to start organizing your files securely.'
+          helperText='Folders help you group related files.'
+          />
+        }
         />
-      </View>
-      :
-      <EmptyState
-      title='No folders yet'
-      description='Create a folder to start organizing your files securely.'
-      helperText='Folders help you group related files.'
-      />
+      </View>      
       }
       <Pressable
       style={styles.addButton}
