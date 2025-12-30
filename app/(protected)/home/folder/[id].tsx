@@ -179,7 +179,6 @@ export default function FolderScreen() {
       fileFetchingStatus === 'error' ?
       <Text>Ooops an error occured while fetching files.</Text>
       :
-      files.length > 0 ?
       uploadStatus === 'loading' ?
       <View style={{ alignItems: 'center', marginTop: 32 }}>
         <ActivityIndicator size='large'/>
@@ -189,7 +188,7 @@ export default function FolderScreen() {
       <View>
         <Text>An error occured while uploading this file.</Text>
       </View>
-      :
+      : files.length > 0 ?
       <FlatList
       contentContainerStyle={{ padding: 16 }}
       data={files}
