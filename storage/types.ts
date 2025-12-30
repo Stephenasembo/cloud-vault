@@ -23,4 +23,23 @@ type SuccessStorageType = {
   data?: User | Folder | File | null;
 }
 
-export { Folder, User, File, SuccessStorageType }
+type FolderMutation =
+  {
+    id: string;
+    type: 'ADD_FOLDER';
+    tempId: string;
+    payload: { name: string };
+  } |
+  {
+    id: string;
+    type: 'UPDATE_FOLDER';
+    folderId: string;
+    payload: { name: string };
+  } |
+  {
+    id: string;
+    type: 'DELETE_FOLDER';
+    folderId: string;
+  };
+
+export { Folder, User, File, SuccessStorageType, FolderMutation }

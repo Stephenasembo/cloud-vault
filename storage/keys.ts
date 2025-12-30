@@ -5,4 +5,6 @@ export const STORAGE_KEYS = {
 
   FOLDER_INDEX: '@cloudvault:folders:all',
   FILE_INDEX: '@cloudvault:files:all',
+
+  FOLDER_MUTATION_QUEUE: '@cloudvault:folder_mutations',
 }
