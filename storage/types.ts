@@ -42,4 +42,20 @@ type FolderMutation =
     folderId: string;
   };
 
-export { Folder, User, File, SuccessStorageType, FolderMutation }
+type FileMutation = 
+{
+  id: string;
+  type: 'RENAME_FILE';
+  folderId: string;
+  fileId: string;
+  payload: { name: string };
+} |
+{
+  id: string;
+  type: 'DELETE_FILE';
+  folderId: string;
+  fileId: string;
+  payload: {filePath: string};
+}
+
+export { Folder, User, File, SuccessStorageType, FolderMutation, FileMutation }

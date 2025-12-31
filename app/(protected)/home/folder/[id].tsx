@@ -15,9 +15,10 @@ import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
 import Toast from 'react-native-toast-message';
 import { COLORS } from '../../../(auth)';
-import { cacheFile, readFolderFilesCache } from '../../../../storage/file';
-import {  File } from "../../../../storage/types";
+import { cacheFile, readFolderFilesCache, removeFileCache } from '../../../../storage/file';
+import {  File, FileMutation } from "../../../../storage/types";
 import { useDeviceContext } from '../../../../context/DeviceContext';
+import { dequeueMutation, enqueueMutation, readMutationQueue } from '../../../../storage/fileQueue';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -45,6 +46,47 @@ export default function FolderScreen() {
 
   const { networkStatus } = useDeviceContext();
 
+  async function refreshApp() {
+    await processFileQueue();
+    await fetchFiles();
+  }
+
+  async function processFileQueue() {
+    if(networkStatus === 'offline') return;
+    const queue = await readMutationQueue();
+    if(queue.length === 0) return;
+
+    for (const mutation of queue) {
+      try {
+        switch (mutation.type) {
+          case 'RENAME_FILE': {
+            const response = await updateDisplayName(mutation.payload.name, mutation.fileId)
+            if(response.error) throw new Error();
+
+            const updatedFile = files.find((file) => file.id === mutation.fileId);
+            if(!updatedFile) throw new Error();
+
+            await dequeueMutation(mutation);
+            await cacheFile(mutation.folderId, mutation.fileId, updatedFile);
+
+            break;
+          }
+          case 'DELETE_FILE': {
+            const response = await deleteFile(mutation.payload.filePath, mutation.fileId);
+            if(response.error) throw new Error()
+
+            await dequeueMutation(mutation);
+
+            break;
+          }
+        }
+      } catch (e) {
+        console.log(e);
+        return
+      }
+    }
+  }
+
   async function fetchFiles() {
     // Read from cache first
     const cachedFiles = await readFolderFilesCache(folderId);
@@ -68,13 +110,45 @@ export default function FolderScreen() {
     }
   }
 
-
   async function handleFileEdit() {
     setModalVisible(false)
     if(!pickedFile) {
       console.log("Error updating file name: File id is null")
       return;
     }
+
+    if(networkStatus === 'offline') {
+
+      const localFiles = files.filter((f) => f.id === pickedFile.fileId);
+      if(localFiles.length === 0) {
+        return;
+      }
+
+      const localFile: File = localFiles[0]
+
+      const mutation: FileMutation = {
+        id: Date.now().toString(),
+        type: 'RENAME_FILE',
+        folderId,
+        fileId: pickedFile.fileId,
+        payload: { name: newName }
+      }
+
+      setFiles(prev => (
+        prev.map((file) => file.id === pickedFile.fileId ? {
+          ...file, name: newName
+        } : file)
+      ))
+
+      await enqueueMutation(mutation);
+      await cacheFile(folderId, pickedFile.fileId, localFile);
+
+      return Toast.show({
+        type: 'success',
+        text1: 'File rename action queued'
+      })
+    }
+
     const response = await updateDisplayName(newName, pickedFile.fileId)
     if(response.error) {
       return Toast.show({
@@ -104,7 +178,29 @@ export default function FolderScreen() {
         text2: 'Please try again.'
       })
     }
+
     const filePath = `public/${userId}/${folderId}/${pickedFile.storagePath}`;
+
+    if(networkStatus === 'offline') {
+      const mutation: FileMutation = {
+        id: Date.now().toString(),
+        type: 'DELETE_FILE',
+        folderId,
+        fileId: pickedFile.fileId,
+        payload: {filePath}
+      }
+
+      setFiles(prev => prev.filter(f => f.id !== pickedFile.fileId))
+
+      await enqueueMutation(mutation);
+      await removeFileCache(folderId, pickedFile.fileId);
+
+      return Toast.show({
+        type: 'success',
+        text1: 'File delete action queued',
+      })
+    }
+
     const response = await deleteFile(filePath, pickedFile.fileId);
     if(response.error) {
       return Toast.show({
@@ -129,13 +225,13 @@ export default function FolderScreen() {
       setRefreshing(false);
       return;
     }
-    await fetchFiles();
+    await refreshApp();
     setRefreshing(false);
   }
 
 
   useEffect(() => {
-    fetchFiles()
+    refreshApp();
   }, [userId, folderId])
 
   async function handleUpload(): Promise<void> {

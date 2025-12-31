@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   FILE_INDEX: '@cloudvault:files:all',
 
   FOLDER_MUTATION_QUEUE: '@cloudvault:folder_mutations',
+  FILE_MUTATION_QUEUE: '@cloudvault:file_mutations',
 }
 
 export function generateFileKey(folderId: string, fileId: string): string {
