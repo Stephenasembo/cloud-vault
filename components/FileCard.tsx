@@ -5,15 +5,13 @@ import { useAuthContext } from '../context/AuthContext'
 import { FileObject } from '@supabase/storage-js';
 import { PickedFileType } from '../types/pickedFile';
 import { categorizeFile } from '../utils/categorizeFile';
-import { getFileDisplayName } from '../services/file';
 import { EllipsisVertical } from 'lucide-react-native';
 
 type FileCardProps = {
   name: string
-  size: number
+  size: string
   uploadedAt: string
   folderId: string
-  setFiles: Dispatch<SetStateAction<FileObject[] | []>>
   id: string
   openMenu: (chosenFile: PickedFileType) => void;
   fileType: string;
@@ -24,8 +22,6 @@ export default function FileCard({
   name,
   size,
   uploadedAt,
-  folderId,
-  setFiles,
   id,
   openMenu,
   fileType,
@@ -34,17 +30,6 @@ export default function FileCard({
 
   const { userId } = useAuthContext();
   const menuRef = useRef<View | null>(null);
-  const [displayName, setDisplayName] = useState(name);
-
-  useEffect(() => {
-    async function fetchFileDisplayName() {
-      const fileDisplayName = await getFileDisplayName(id);
-      if(fileDisplayName) {
-        setDisplayName(fileDisplayName)
-      }
-    }
-    fetchFileDisplayName()
-  }, [id, name])
 
   return (
     <View style={styles.card}>
@@ -55,7 +40,7 @@ export default function FileCard({
             style={styles.fileName}
             numberOfLines={1} ellipsizeMode="tail"
             >
-              {displayName}
+              {name}
             </Text>
           </View>
           <View
@@ -69,7 +54,7 @@ export default function FileCard({
               onPress={() => {
                 menuRef.current?.measureInWindow((x, y, width, height) => {
                 openMenu({
-                name: displayName,
+                name: name,
                 fileId: id,
                 storagePath: storagePath,
                 coordinates: {
@@ -84,7 +69,7 @@ export default function FileCard({
         </View>
         <View style={styles.metaDataContainer}>
           <Text style={styles.metaText}>
-            {categorizeFile(fileType)} • {formatFileSize(size)} • {formatDate(uploadedAt)}
+            {fileType} • {size} • {uploadedAt}
           </Text>
         </View>
       </View>

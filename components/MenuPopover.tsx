@@ -13,7 +13,6 @@ export type MenuType = {
   fileId: string;
   menuVisible: boolean;
   setMenuVisible: Dispatch<SetStateAction<boolean>>;
-  setFiles: Dispatch<SetStateAction<FileObject[] | []>>;
   coordinates: { x: number, y: number};
   setModalVisible: Dispatch<SetStateAction<boolean>>;
   setDeleteModalVisible: Dispatch<SetStateAction<boolean>>;
@@ -27,7 +26,6 @@ export default function MenuPopover({
   fileId,
   menuVisible,
   setMenuVisible,
-  setFiles,
   coordinates,
   setModalVisible,
   setDeleteModalVisible,

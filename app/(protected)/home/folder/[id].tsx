@@ -15,6 +15,9 @@ import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
 import Toast from 'react-native-toast-message';
 import { COLORS } from '../../../(auth)';
+import { cacheFile, readFolderFilesCache } from '../../../../storage/file';
+import {  File } from "../../../../storage/types";
+import { useDeviceContext } from '../../../../context/DeviceContext';
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -28,7 +31,7 @@ export default function FolderScreen() {
     })
   }, [folderName])
 
-  const [ files, setFiles] = useState<FileObject[] | []>([]);
+  const [ files, setFiles] = useState<File[]>([]);
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
   const [pickedFile, setPickedFile] = useState<PickedFileType | null>(null);
   const [fileFetchingStatus, setFileFetchingStatus] = useState<FetchingStatusType>('idle');
@@ -38,6 +41,8 @@ export default function FolderScreen() {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [uploadStatus, setUploadStatus] = useState<FetchingStatusType>('idle');
+
+  const { networkStatus } = useDeviceContext();
 
   async function handleFileEdit() {
     setModalVisible(false)
@@ -54,7 +59,7 @@ export default function FolderScreen() {
     }
     const newFiles = files.map(file => file.id === response.data.id ? {
       ...file,
-      metadata: {...file.metadata, display_name: response.data.display_name},
+      name: response.data.display_name,
     }: file);
 
     setFiles(newFiles)
@@ -92,21 +97,39 @@ export default function FolderScreen() {
 
   useEffect(() => {
     async function fetchFiles() {
-      if (!userId || !folderId) return;
-      setFileFetchingStatus('loading')
-      const data = await readFolderUploads(userId, folderId);
-      if(data.error) {
-        setFileFetchingStatus('error');
-        Alert.alert(data.messageTitle);
-        return;
+      // Read from cache first
+      const cachedFiles = await readFolderFilesCache(folderId);
+      if(cachedFiles.length > 0) {
+        setFiles(cachedFiles);
+        setFileFetchingStatus('success');
       }
-      setFileFetchingStatus('success');
-      setFiles(data.files)
+
+      // Fetch from backend
+      if(networkStatus === 'online') {
+        if (!userId || !folderId) return;
+        setFileFetchingStatus('loading')
+        const data = await readFolderUploads(userId, folderId);
+        if(data.error) {
+          setFileFetchingStatus('error');
+          Alert.alert(data.messageTitle);
+          return;
+        }
+        setFileFetchingStatus('success');
+        setFiles(data.files)
+      }
     }
     fetchFiles()
   }, [userId, folderId])
 
   async function handleUpload(): Promise<void> {
+    if(networkStatus === 'offline') {
+      Alert.alert(
+        'File cannot be uploaded while offline',
+        'Please connect to the interent and try again.'
+      )
+      return;
+    }
+
     if(!userId) return;
     setUploadStatus('loading');
     const file = await uploadFile(userId, folderId);
@@ -143,6 +166,10 @@ export default function FolderScreen() {
       type: 'success',
       text1: 'File uploaded successfully.'
     })
+
+    // Cache uploaded file
+    await cacheFile(folderId, file.data.id, file.data);
+
     const data = await readFolderUploads(userId, folderId);
     if(!data.error) {
       setFiles(data.files);
@@ -192,16 +219,15 @@ export default function FolderScreen() {
       <FlatList
       contentContainerStyle={{ padding: 16 }}
       data={files}
-      keyExtractor={(item: FileObject) => item.id}
+      keyExtractor={(item: File) => item.id}
       renderItem={({item}) => (
         <FileCard
-        name={item.metadata.display_name}
-        size={item.metadata.size}
-        uploadedAt={item.updated_at}
+        name={item.name}
+        size={item.size}
+        uploadedAt={item.uploadedAt}
         folderId={folderId}
-        setFiles={setFiles}
         id={item.id}
-        fileType={item.metadata.mimetype}
+        fileType={item.type}
         openMenu={(pickedFile: PickedFileType) => {
           setMenuVisible(true);
           setPickedFile(pickedFile)
@@ -226,7 +252,6 @@ export default function FolderScreen() {
           coordinates={pickedFile.coordinates}
           menuVisible={menuVisible}
           setMenuVisible={setMenuVisible}
-          setFiles={setFiles}
           setModalVisible={setModalVisible}
           setDeleteModalVisible={setDeleteModalVisible}
           storagePath={pickedFile.storagePath}

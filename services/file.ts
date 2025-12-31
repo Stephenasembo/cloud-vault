@@ -15,10 +15,10 @@ type FileMetadata = {
   user_id: string;
 }
 
-export async function getFileDisplayName(fileId: string): Promise<string | null> {
+export async function getFileMetadata(fileId: string): Promise<FileMetadata | null> {
   const { data, error } = await supabase
   .from('Files')
-  .select('display_name')
+  .select()
   .eq('id', fileId)
   .single()
   if(error) {
@@ -26,7 +26,7 @@ export async function getFileDisplayName(fileId: string): Promise<string | null>
     return null;
   }
   console.log("Successfully got file display name", data)
-  return data.display_name
+  return data
 }
 
 export async function createFileMetadata(fileId: string, userId: string, fileName: string, filePath: string) {

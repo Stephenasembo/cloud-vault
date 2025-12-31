@@ -2,19 +2,20 @@ import { decode } from 'base64-arraybuffer'
 import { supabase } from '../lib/supabase'
 import { pickFile, readFileAsBase64 } from '../utils/filePicker'
 import { FileObject } from '@supabase/storage-js'
-import { createFileMetadata, deleteFileMetadata } from './file'
+import { createFileMetadata, deleteFileMetadata, getFileMetadata } from './file'
 import { ErrorType, FilePickSuccess } from '../utils/filePicker'
+import { File } from '../storage/types'
+import { categorizeFile } from '../utils/categorizeFile'
+import { formatDate, formatFileSize } from '../utils/fileDetailsFormat'
 
 export type UploadSuccessType = {
   error: false
-  id: string;
-  path: string;
-  fullPath: string;
+  data: File
 }
 
 export type FileFetchSuccessType = {
   error: false;
-  files: FileObject[];
+  files: File[];
 }
 
 export type DeleteSuccessType = {
@@ -61,11 +62,20 @@ export async function uploadFile(userId: string, folderId: string): Promise<Uplo
       message: "Please try again",
     }
   }
+
+  const uploadedFile = {
+    id: data.id,
+    storagePath: data.path,
+    folderId,
+    uploadedAt: formatDate(fileData.created_at),
+    size: formatFileSize(file.size?? 0),
+    type: categorizeFile(file.mimeType),
+    name: fileData.display_name,
+  }
+
   return {
     error: false,
-    id: data.id,
-    path: data.path,
-    fullPath: data.fullPath,
+    data: uploadedFile,
   }
 }
 
@@ -86,10 +96,27 @@ export async function readFolderUploads(userId: string, folderId: string): Promi
       messageTitle: "An error occured while fetching files."
     }
   }
+
+  const storedFiles: (File | null)[] = await Promise.all(data.map(async (file) => {
+    const metadata = await getFileMetadata(file.id);
+    if(!metadata) return null;
+
+    const fileData: File = {
+      id: file.id,
+      name: metadata.display_name,
+      storagePath: metadata.storage_path,
+      folderId: folderId,
+      uploadedAt: formatDate(file.updated_at),
+      size: formatFileSize(file.metadata.size?? 0),
+      type: categorizeFile(file.metadata.mimetype),
+    }
+    return fileData;
+  }))
+
   console.log('Folder files:', data)
   return {
     error: false,
-    files: data,
+    files: storedFiles.filter((f) => f !== null),
   };
 }
 

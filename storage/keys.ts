@@ -8,3 +8,11 @@ export const STORAGE_KEYS = {
 
   FOLDER_MUTATION_QUEUE: '@cloudvault:folder_mutations',
 }
+
+export function generateFileKey(folderId: string, fileId: string): string {
+  return `${STORAGE_KEYS.FOLDERS}:${folderId}:FILES:${fileId}`
+}
+
+export function getFolderFileIndex(folderId: string): string {
+  return `${STORAGE_KEYS.FOLDERS}:${folderId}:all`
+}

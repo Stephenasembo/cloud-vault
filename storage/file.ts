@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { File, SuccessStorageType } from './types';
 import { ErrorType } from '../types/errorType';
-import { STORAGE_KEYS } from './keys';
+import { STORAGE_KEYS, generateFileKey, getFolderFileIndex } from './keys';
 import { addIndex, removeIndex } from './cache';
 
-export async function cacheFile(fileId: string, fileData: File): Promise<ErrorType | SuccessStorageType> {
+export async function cacheFile(folderId: string, fileId: string, fileData: File): Promise<ErrorType | SuccessStorageType> {
   try{
-    const fileKey = `${STORAGE_KEYS.FILES}:${fileId}`;
+    const fileKey = generateFileKey(folderId, fileId);
     await AsyncStorage.setItem(fileKey, JSON.stringify(fileData));
-    await addIndex(STORAGE_KEYS.FILE_INDEX, fileId);
+    await addIndex(getFolderFileIndex(folderId), fileId);
     return {
       error: false,
       message: 'Successfully cached file data.'
@@ -22,9 +22,28 @@ export async function cacheFile(fileId: string, fileData: File): Promise<ErrorTy
   }
 }
 
-export async function readFileCache(fileId: string): Promise<ErrorType | SuccessStorageType> {
+export async function readFolderFilesCache(folderId: string): Promise<File[]> {
   try {
-    const fileKey = `${STORAGE_KEYS.FILES}:${fileId}`;
+    const fileIndex = await AsyncStorage.getItem(getFolderFileIndex(folderId));
+    if(!fileIndex) return [];
+    const idArray = JSON.parse(fileIndex);
+    const fileArray: (File | null)[] = await Promise.all(
+      idArray.map( async(id: string) => {
+        const response = await readFileCache(folderId, id);
+        if (response.error) return null;
+        return response.data;
+      })
+    )
+    return fileArray.filter((file) => file !== null);
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+}
+
+export async function readFileCache(folderId: string, fileId: string): Promise<ErrorType | SuccessStorageType> {
+  try {
+    const fileKey = generateFileKey(folderId, fileId)
     const cacheData = await AsyncStorage.getItem(fileKey);
     if(!cacheData) {
       return {
@@ -47,22 +66,9 @@ export async function readFileCache(fileId: string): Promise<ErrorType | Success
   }
 }
 
-export async function readAllFilesCache() {
-  const storedIndex = await AsyncStorage.getItem(STORAGE_KEYS.FILE_INDEX);
-  if(!storedIndex) return [];
-  const idArray = JSON.parse(storedIndex);
-  const fileArray: (File | null)[] = await Promise.all(idArray.map(async (id: string) => {
-    const response = await readFileCache(id);
-    if(response.error) return null;
-    return response.data;
-  }));
-  return fileArray.filter((file) => file !== null)
-
-}
-
-export async function removeFileCache(fileId: string) {
+export async function removeFileCache(folderId: string, fileId: string) {
   try {
-    const fileKey = `${STORAGE_KEYS.FILES}:${fileId}`;
+    const fileKey = generateFileKey(folderId, fileId);
     await AsyncStorage.removeItem(fileKey);
     await removeIndex(STORAGE_KEYS.FILE_INDEX, fileId);
     return {
