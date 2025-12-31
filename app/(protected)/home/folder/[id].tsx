@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Alert, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { readFolderUploads, uploadFile, deleteFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
@@ -23,6 +23,7 @@ export default function FolderScreen() {
   const { userId } = useAuthContext();
   const { id: folderId , folderName } = useLocalSearchParams<{ id: string, folderName: string }>();
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -43,6 +44,30 @@ export default function FolderScreen() {
   const [uploadStatus, setUploadStatus] = useState<FetchingStatusType>('idle');
 
   const { networkStatus } = useDeviceContext();
+
+  async function fetchFiles() {
+    // Read from cache first
+    const cachedFiles = await readFolderFilesCache(folderId);
+    if(cachedFiles.length > 0) {
+      setFiles(cachedFiles);
+      setFileFetchingStatus('success');
+    }
+
+    // Fetch from backend
+    if(networkStatus === 'online') {
+      if (!userId || !folderId) return;
+      setFileFetchingStatus('loading')
+      const data = await readFolderUploads(userId, folderId);
+      if(data.error) {
+        setFileFetchingStatus('error');
+        Alert.alert(data.messageTitle);
+        return;
+      }
+      setFileFetchingStatus('success');
+      setFiles(data.files)
+    }
+  }
+
 
   async function handleFileEdit() {
     setModalVisible(false)
@@ -94,30 +119,22 @@ export default function FolderScreen() {
     setFiles(prev => prev.filter(f => f.id !== pickedFile.fileId))
   }
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    if(networkStatus === 'offline') {
+      Toast.show({
+        type: 'error',
+        text1: 'Please connect to the internet to refresh app.'
+      })
+      setRefreshing(false);
+      return;
+    }
+    await fetchFiles();
+    setRefreshing(false);
+  }
+
 
   useEffect(() => {
-    async function fetchFiles() {
-      // Read from cache first
-      const cachedFiles = await readFolderFilesCache(folderId);
-      if(cachedFiles.length > 0) {
-        setFiles(cachedFiles);
-        setFileFetchingStatus('success');
-      }
-
-      // Fetch from backend
-      if(networkStatus === 'online') {
-        if (!userId || !folderId) return;
-        setFileFetchingStatus('loading')
-        const data = await readFolderUploads(userId, folderId);
-        if(data.error) {
-          setFileFetchingStatus('error');
-          Alert.alert(data.messageTitle);
-          return;
-        }
-        setFileFetchingStatus('success');
-        setFiles(data.files)
-      }
-    }
     fetchFiles()
   }, [userId, folderId])
 
@@ -215,11 +232,21 @@ export default function FolderScreen() {
       <View>
         <Text>An error occured while uploading this file.</Text>
       </View>
-      : files.length > 0 ?
+      :
       <FlatList
       contentContainerStyle={{ padding: 16 }}
       data={files}
       keyExtractor={(item: File) => item.id}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
+      }
+      ListEmptyComponent={
+        <EmptyState
+        title='This folder is empty'
+        description='Upload a file to get started.'
+        helperText='Files up to 5MB are supported.'
+        />
+      }
       renderItem={({item}) => (
         <FileCard
         name={item.name}
@@ -235,11 +262,6 @@ export default function FolderScreen() {
         storagePath={item.name}
         />
       )}
-      /> :
-      <EmptyState
-      title='This folder is empty'
-      description='Upload a file to get started.'
-      helperText='Files up to 5MB are supported.'
       />
       }
 
