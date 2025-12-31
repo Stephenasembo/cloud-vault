@@ -25,6 +25,7 @@ export default function FolderScreen() {
   const { id: folderId , folderName } = useLocalSearchParams<{ id: string, folderName: string }>();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -49,6 +50,7 @@ export default function FolderScreen() {
   async function refreshApp() {
     await processFileQueue();
     await fetchFiles();
+    await trackChanges();
   }
 
   async function processFileQueue() {
@@ -68,6 +70,7 @@ export default function FolderScreen() {
 
             await dequeueMutation(mutation);
             await cacheFile(mutation.folderId, mutation.fileId, updatedFile);
+            console.log('File mutation cleared')
 
             break;
           }
@@ -143,6 +146,7 @@ export default function FolderScreen() {
 
       await enqueueMutation(mutation);
       await cacheFile(folderId, pickedFile.fileId, localFile);
+      await trackChanges();
 
       return Toast.show({
         type: 'success',
@@ -195,6 +199,7 @@ export default function FolderScreen() {
 
       await enqueueMutation(mutation);
       await removeFileCache(folderId, pickedFile.fileId);
+      await trackChanges();
 
       return Toast.show({
         type: 'success',
@@ -233,6 +238,10 @@ export default function FolderScreen() {
 
   useEffect(() => {
     refreshApp();
+
+    return () => {
+      setHasPendingChanges(false);
+    }
   }, [userId, folderId])
 
   async function handleUpload(): Promise<void> {
@@ -296,6 +305,15 @@ export default function FolderScreen() {
     }
   }
 
+  async function trackChanges() {
+    const queue = await readMutationQueue();
+    console.log('file queue', queue)
+    if(queue.length > 0) {
+      return setHasPendingChanges(true)
+    }
+    setHasPendingChanges(false);
+  }
+
   if(!userId || !folderId) {
     Toast.show({
       type: 'error',
@@ -330,36 +348,47 @@ export default function FolderScreen() {
         <Text>An error occured while uploading this file.</Text>
       </View>
       :
-      <FlatList
-      contentContainerStyle={{ padding: 16 }}
-      data={files}
-      keyExtractor={(item: File) => item.id}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
-      }
-      ListEmptyComponent={
-        <EmptyState
-        title='This folder is empty'
-        description='Upload a file to get started.'
-        helperText='Files up to 5MB are supported.'
+      <View style={{ flex: 1 }}>
+        {
+          networkStatus === 'offline' && hasPendingChanges && (
+            <View style={styles.pendingContainer}>
+              <Text style={styles.pendingText}>
+                You have offline changes. Pull to sync when online.
+              </Text>
+            </View>
+          )
+        }
+        <FlatList
+        contentContainerStyle={{ padding: 16 }}
+        data={files}
+        keyExtractor={(item: File) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
+        }
+        ListEmptyComponent={
+          <EmptyState
+          title='This folder is empty'
+          description='Upload a file to get started.'
+          helperText='Files up to 5MB are supported.'
+          />
+        }
+        renderItem={({item}) => (
+          <FileCard
+          name={item.name}
+          size={item.size}
+          uploadedAt={item.uploadedAt}
+          folderId={folderId}
+          id={item.id}
+          fileType={item.type}
+          openMenu={(pickedFile: PickedFileType) => {
+            setMenuVisible(true);
+            setPickedFile(pickedFile)
+          }}
+          storagePath={item.name}
+          />
+        )}
         />
-      }
-      renderItem={({item}) => (
-        <FileCard
-        name={item.name}
-        size={item.size}
-        uploadedAt={item.uploadedAt}
-        folderId={folderId}
-        id={item.id}
-        fileType={item.type}
-        openMenu={(pickedFile: PickedFileType) => {
-          setMenuVisible(true);
-          setPickedFile(pickedFile)
-        }}
-        storagePath={item.name}
-        />
-      )}
-      />
+      </View>
       }
 
       {pickedFile &&
@@ -418,6 +447,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: COLORS.primary,
+  },
+
+  pendingContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+
+  pendingText: {
+    color: COLORS.mutedText,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 
   addButton: {

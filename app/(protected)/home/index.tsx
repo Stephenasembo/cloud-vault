@@ -18,7 +18,7 @@ export default function Home() {
   const [folderMenuVisible, setFolderMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const { userFolders, addFolder, folderFetchingStatus, editUserFolder, deleteUserFolder, refreshFolders } = useFoldersContext();
+  const { userFolders, addFolder, folderFetchingStatus, editUserFolder, deleteUserFolder, refreshFolders, hasPendingChanges } = useFoldersContext();
   const [pickedFolder, setPickedFolder] = useState<PickedFolder | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
@@ -106,36 +106,47 @@ export default function Home() {
       : folderFetchingStatus === 'error' ?
       <Text>Ooops an error occured while fetching your folders</Text>
       :
-      <View style={styles.folderContainer}>
-        <FlatList
-        contentContainerStyle={styles.listContent}
-        data={userFolders}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
+      <View style={{flex: 1}}>
+        {
+          networkStatus === 'offline' && hasPendingChanges && (
+            <View style={styles.pendingContainer}>
+              <Text style={styles.pendingText}>
+                You have offline changes. Pull to sync when online.
+              </Text>
+            </View>
+          )
         }
-        keyExtractor={(item: Folder) => item.id}
-        renderItem={({item}) => (
-          <FolderCard
-          folderName={item.name}
-          folderId={item.id}
-          openMenu={(pickedFolder: PickedFolder) => {
-            setFolderMenuVisible(true);
-            setPickedFolder(pickedFolder);
-          }}
-          handleOpen={() => router.navigate({
-            pathname: `/home/folder/${item.id}`,
-            params: {folderName: item.name}})}
+        <View style={styles.folderContainer}>
+          <FlatList
+          contentContainerStyle={styles.listContent}
+          data={userFolders}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
+          }
+          keyExtractor={(item: Folder) => item.id}
+          renderItem={({item}) => (
+            <FolderCard
+            folderName={item.name}
+            folderId={item.id}
+            openMenu={(pickedFolder: PickedFolder) => {
+              setFolderMenuVisible(true);
+              setPickedFolder(pickedFolder);
+            }}
+            handleOpen={() => router.navigate({
+              pathname: `/home/folder/${item.id}`,
+              params: {folderName: item.name}})}
+            />
+          )}
+          ListEmptyComponent={
+            <EmptyState
+            title='No folders yet'
+            description='Create a folder to start organizing your files securely.'
+            helperText='Folders help you group related files.'
+            />
+          }
           />
-        )}
-        ListEmptyComponent={
-          <EmptyState
-          title='No folders yet'
-          description='Create a folder to start organizing your files securely.'
-          helperText='Folders help you group related files.'
-          />
-        }
-        />
-      </View>      
+        </View>
+      </View>
       }
       <Pressable
       style={styles.addButton}
@@ -197,6 +208,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '800',
     color: COLORS.primary,
+  },
+
+  pendingContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+
+  pendingText: {
+    color: COLORS.mutedText,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 
   folderContainer: {

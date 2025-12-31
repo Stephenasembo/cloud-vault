@@ -22,6 +22,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
   const [userFolders, setUserFolders] = useState<Folder[]>([]);
   const [folderFetchingStatus, setFolderFetchingStatus] = useState<FetchingStatusType>('idle');
   const { networkStatus } = useDeviceContext();
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
 
   async function processFolderQueue() {
     const queue = await readMutationQueue();
@@ -95,6 +96,8 @@ export default function FoldersProvider({children} : PropsWithChildren) {
         console.log("Failed to fetch folders:", err);
       }
     }
+
+    await trackChanges();
   }
 
   async function addFolder(folderName: string): Promise<SuccessType | ErrorType> {
@@ -123,6 +126,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
         await enqueueMutation(mutation);
         setUserFolders(prev => [...prev, localFolder]);
         await cacheFolder(localFolder.id, localFolder);
+        await trackChanges();
 
         return {
           error: false,
@@ -167,6 +171,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
 
       await enqueueMutation(mutation);
       await removeFolderCache(folderId);
+      await trackChanges();
 
       return {
         error: false,
@@ -214,6 +219,7 @@ export default function FoldersProvider({children} : PropsWithChildren) {
 
       await enqueueMutation(mutation);
       await cacheFolder(folderId, localFolder);
+      await trackChanges();
 
       return {
         error: false,
@@ -239,13 +245,21 @@ export default function FoldersProvider({children} : PropsWithChildren) {
     }
   }
 
+  async function trackChanges() {
+    const queue = await readMutationQueue();
+    if(queue.length > 0) {
+      return setHasPendingChanges(true)
+    }
+    setHasPendingChanges(false);
+  }
+  
   console.log("Fetched folders:", userFolders)
   useEffect(() => {
     refreshFolders();
   }, [userId])
 
   return (
-    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder, editUserFolder, folderFetchingStatus }}>
+    <FoldersContext value={{ userFolders, refreshFolders, addFolder, deleteUserFolder, editUserFolder, folderFetchingStatus, hasPendingChanges }}>
       {children}
     </FoldersContext>
   )
