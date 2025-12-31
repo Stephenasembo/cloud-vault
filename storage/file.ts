@@ -84,12 +84,12 @@ export async function removeFileCache(folderId: string, fileId: string) {
   }
 }
 
-export async function syncFilesCache(files: File[]) {
+export async function syncFilesCache(folderId:string, files: File[]) {
   const fileIds = files.map((file) => file.id);
-  await AsyncStorage.setItem(STORAGE_KEYS.FILE_INDEX, JSON.stringify(fileIds));
+  await AsyncStorage.setItem(getFolderFileIndex(folderId), JSON.stringify(fileIds));
   await Promise.all(
     files.map((file: File) => {
-      const fileKey = `${STORAGE_KEYS.FILES}:${file.id}`;
+      const fileKey = generateFileKey(folderId, file.id);
       return AsyncStorage.setItem(fileKey, JSON.stringify(file));
     })
   )

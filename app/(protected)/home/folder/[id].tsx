@@ -15,7 +15,7 @@ import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
 import Toast from 'react-native-toast-message';
 import { COLORS } from '../../../(auth)';
-import { cacheFile, readFolderFilesCache, removeFileCache } from '../../../../storage/file';
+import { cacheFile, readFolderFilesCache, removeFileCache, syncFilesCache } from '../../../../storage/file';
 import {  File, FileMutation } from "../../../../storage/types";
 import { useDeviceContext } from '../../../../context/DeviceContext';
 import { dequeueMutation, enqueueMutation, readMutationQueue } from '../../../../storage/fileQueue';
@@ -106,7 +106,8 @@ export default function FolderScreen() {
         return;
       }
       setFileFetchingStatus('success');
-      setFiles(data.files)
+      setFiles(data.files);
+      await syncFilesCache(folderId, data.files);
     }
   }
 
