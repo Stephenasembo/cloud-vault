@@ -5,7 +5,7 @@ import { FileObject } from '@supabase/storage-js';
 import { deleteFile, shareFile } from "../services/storage";
 import { Placement, Point } from 'react-native-popover-view/dist/Types'
 import { useRouter } from "expo-router";
-import { COLORS } from "../app/(auth)";
+import { ColorTheme, useThemeContext } from "../context/ThemeContext";
 
 export type FolderMenuType = {
   folderId: string;
@@ -26,8 +26,11 @@ export default function FolderMenu({
 }: FolderMenuType) {
 
   const router = useRouter();
+  const { colors } = useThemeContext();
+
   const point = useMemo(() => new Point(coordinates.x, coordinates.y),
   [coordinates.x, coordinates.y]);
+  const styles = useMemo(() => createThemedStyles(colors), [colors])
 
   return (
     <Popover
@@ -60,38 +63,40 @@ export default function FolderMenu({
   )
 }
 
-const styles = StyleSheet.create({
-  modalContent: {
-    backgroundColor: 'white',
-    minWidth: 160,
-    elevation: 8,
-    paddingVertical: 12,
-    borderRadius: 14,
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    modalContent: {
+      backgroundColor: 'white',
+      minWidth: 160,
+      elevation: 8,
+      paddingVertical: 12,
+      borderRadius: 14,
 
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 6 },
-  },
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 6 },
+    },
 
-  modalButton: {
-    borderWidth: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 16,
-    margin: 8,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
+    modalButton: {
+      borderWidth: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      fontSize: 16,
+      margin: 8,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
 
-  modalButtonText: {
-    fontSize: 14,
-    color: COLORS.primary,
-  },
+    modalButtonText: {
+      fontSize: 14,
+      color: colors.primary,
+    },
 
-  deleteText: {
-    color: '#DC2626',
-    fontWeight: '500',
-  },
-})
+    deleteText: {
+      color: '#DC2626',
+      fontWeight: '500',
+    },
+  })
+)

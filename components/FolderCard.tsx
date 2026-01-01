@@ -1,11 +1,11 @@
 import { Pressable, View, Text, StyleSheet, Alert } from "react-native"
 import { useFoldersContext } from "../context/FoldersContext";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState, useMemo } from "react";
 import InputModal from "./InputModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import Toast from 'react-native-toast-message';
 import { EllipsisVertical } from "lucide-react-native";
-import { COLORS } from "../app/(auth)";
+import { ColorTheme, useThemeContext } from "../context/ThemeContext";
 
 export type PickedFolder = {
   id: string;
@@ -22,6 +22,9 @@ export type FolderCardProps = {
 
 export default function FolderCard ({ folderName, folderId, openMenu, handleOpen }: FolderCardProps) {  
   const menuRef = useRef<View | null>(null);
+  const { colors } = useThemeContext();
+  
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
   return (
     <View>
@@ -59,32 +62,34 @@ export default function FolderCard ({ folderName, folderId, openMenu, handleOpen
   )
 }
 
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 16,
-    backgroundColor: 'white',
-    borderColor: COLORS.border,
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    card: {
+      borderRadius: 14,
+      padding: 18,
+      marginBottom: 16,
+      backgroundColor: 'white',
+      borderColor: colors.border,
 
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
 
-    elevation: 6,
-  },
+      elevation: 6,
+    },
 
-  cardText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
+    cardText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  menuButton: {
-    minWidth: 44,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
-})
+    menuButton: {
+      minWidth: 44,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
+  })
+)

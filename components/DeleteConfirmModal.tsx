@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Pressable,
 } from "react-native";
-import { Dispatch, SetStateAction } from "react";
-import { COLORS } from "../app/(auth)";
+import { Dispatch, SetStateAction, useMemo } from "react";
+import { ColorTheme, useThemeContext } from "../context/ThemeContext";
 
 export type DeleteConfirmModalProps = {
   modalVisible: boolean;
@@ -23,6 +23,11 @@ export default function DeleteConfirmModal({
   title,
   assetName,
 }: DeleteConfirmModalProps) {
+
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
+
   return (
     <Modal
       visible={modalVisible}
@@ -65,67 +70,69 @@ export default function DeleteConfirmModal({
   );
 }
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
 
-  modalCard: {
-    width: '85%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    elevation: 5,
-  },
+    modalCard: {
+      width: '85%',
+      backgroundColor: 'white',
+      padding: 20,
+      borderRadius: 16,
+      elevation: 5,
+    },
 
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginBottom: 16,
+    },
 
-  modalDescription: {
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: 20,
-  },
+    modalDescription: {
+      textAlign: 'center',
+      color: '#666',
+      marginBottom: 20,
+    },
 
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-  },
+    modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 12,
+    },
 
-  cancelButton: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
+    cancelButton: {
+      borderWidth: 1,
+      borderRadius: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+    },
 
-  cancelText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-  },
+    cancelText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+    },
 
-  deleteButton: {
-    backgroundColor: '#e53935',
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-  },
+    deleteButton: {
+      backgroundColor: '#e53935',
+      borderRadius: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+    },
 
-  deleteText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 15,
-  },
-});
+    deleteText: {
+      color: 'white',
+      fontWeight: '600',
+      fontSize: 15,
+    },
+  })
+);
