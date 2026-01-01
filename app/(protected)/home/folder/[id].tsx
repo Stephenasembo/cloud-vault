@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Pressable, Alert, FlatList, ActivityIndicator, 
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { readFolderUploads, uploadFile, deleteFile } from '../../../../services/storage';
 import { useAuthContext } from '../../../../context/AuthContext';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import { FileObject } from '@supabase/storage-js';
 import FileCard from '../../../../components/FileCard';
 import { useFoldersContext } from '../../../../context/FoldersContext';
@@ -14,11 +14,11 @@ import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import { FetchingStatusType } from '../../../../types/fetchingStatus';
 import EmptyState from '../../../../components/emptyState';
 import Toast from 'react-native-toast-message';
-import { COLORS } from '../../../(auth)';
 import { cacheFile, readFolderFilesCache, removeFileCache, syncFilesCache } from '../../../../storage/file';
 import {  File, FileMutation } from "../../../../storage/types";
 import { useDeviceContext } from '../../../../context/DeviceContext';
 import { dequeueMutation, enqueueMutation, readMutationQueue } from '../../../../storage/fileQueue';
+import { ColorTheme, useThemeContext } from "../../../../context/ThemeContext";
 
 export default function FolderScreen() {
   const { userId } = useAuthContext();
@@ -26,6 +26,9 @@ export default function FolderScreen() {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [hasPendingChanges, setHasPendingChanges] = useState(false);
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -432,57 +435,58 @@ export default function FolderScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  headingContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
+    headingContainer: {
+      padding: 16,
+      alignItems: 'center',
+    },
 
-  headingText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
+    headingText: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.primary,
+    },
 
-  pendingContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
+    pendingContainer: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
 
-  pendingText: {
-    color: COLORS.mutedText,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
+    pendingText: {
+      color: colors.mutedText,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
 
-  addButton: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    addButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 30,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
 
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
+      shadowColor: colors.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 6 },
 
-    elevation: 6,
-  },
+      elevation: 6,
+    },
 
-  addButtonText: {
-    fontSize: 32,
-    color: 'white',
-    fontWeight: '400',
-  },
-
-})
+    addButtonText: {
+      fontSize: 32,
+      color: 'white',
+      fontWeight: '400',
+    },
+  }
+))

@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
-import { COLORS } from "./index";
-import { styles } from "./signup";
+import { createThemedStyles } from "./signup";
 import { useDeviceContext } from "../../context/DeviceContext";
+import { useThemeContext } from "../../context/ThemeContext";
 
 export default function Login() {
   const { networkStatus } = useDeviceContext();  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { colors } = useThemeContext();
+  
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
   async function loginUser() {
     if(networkStatus === 'offline') {
@@ -62,7 +65,7 @@ export default function Login() {
                 <TextInput
                   style={styles.input}
                   placeholder="johndoe@gmail.com"
-                  placeholderTextColor={COLORS.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   onChangeText={setEmail}
                 />
               </View>
@@ -71,7 +74,7 @@ export default function Login() {
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your password"
-                  placeholderTextColor={COLORS.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   secureTextEntry
                   onChangeText={setPassword}
                 />

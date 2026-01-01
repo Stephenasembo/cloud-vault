@@ -4,12 +4,16 @@ import ProfileLink from "../../../components/ProfileLink";
 import { Link } from "expo-router";
 import { supabase } from "../../../lib/supabase";
 import { FileText, HelpCircle, Settings, LogOut } from "lucide-react-native";
-import { COLORS } from "../../(auth)";
 import LogoutModal from "../../../components/LogoutModal";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { ColorTheme, useThemeContext } from "../../../context/ThemeContext";
 
 export default function Profile() {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
+
   async function logoutUser() {
     const { error } = await supabase.auth.signOut()
     if (error) console.log(`Error on signing out: ${error}`)
@@ -57,25 +61,26 @@ export default function Profile() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    paddingHorizontal: 16,
-  },
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: 16,
+    },
 
-  sectionTitle: {
-    textAlign: 'center',
-    marginVertical: 20,
-    fontWeight: '600',
-    fontSize: 24,
-    color: COLORS.primary,
-  },
-  
-  linksContainer: {
-    marginVertical: 10,
-    flex: 1,
-    justifyContent: 'space-evenly',
-    paddingHorizontal: 16,
-  },
-})
+    sectionTitle: {
+      textAlign: 'center',
+      marginVertical: 20,
+      fontWeight: '600',
+      fontSize: 24,
+      color: colors.primary,
+    },
+    
+    linksContainer: {
+      marginVertical: 10,
+      flex: 1,
+      justifyContent: 'space-evenly',
+      paddingHorizontal: 16,
+    },
+  }))

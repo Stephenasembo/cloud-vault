@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList, ActivityIndicator, RefreshControl } from "react-native" 
 import { createFolder } from "../../../services/folder";
 import { useAuthContext } from "../../../context/AuthContext";
@@ -11,8 +11,8 @@ import EmptyState from "../../../components/emptyState";
 import Toast from 'react-native-toast-message';
 import FolderMenu from "../../../components/FolderMenu";
 import DeleteConfirmModal from "../../../components/DeleteConfirmModal";
-import { COLORS } from "../../(auth)";
 import { useDeviceContext } from "../../../context/DeviceContext";
+import { ColorTheme, useThemeContext } from "../../../context/ThemeContext";
 
 export default function Home() {
   const [folderMenuVisible, setFolderMenuVisible] = useState(false);
@@ -25,6 +25,9 @@ export default function Home() {
   const [newFolderName, setNewFolderName] = useState(folderName);
   const [refreshing, setRefreshing] = useState(false);
   const { networkStatus } = useDeviceContext();
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
   const router = useRouter();
 
@@ -193,73 +196,75 @@ export default function Home() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  headingContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
+    headingContainer: {
+      padding: 16,
+      alignItems: 'center',
+    },
 
-  heading: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.primary,
-  },
+    heading: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: colors.primary,
+    },
 
-  pendingContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
+    pendingContainer: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
 
-  pendingText: {
-    color: COLORS.mutedText,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
+    pendingText: {
+      color: colors.mutedText,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
 
-  folderContainer: {
-    flex: 1,
-    width: '100%',
-    marginVertical: 16,
-  },
+    folderContainer: {
+      flex: 1,
+      width: '100%',
+      marginVertical: 16,
+    },
 
-  listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 120,
-  },
+    listContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 120,
+    },
 
-  addButton: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    addButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 30,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
 
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
+      shadowColor: colors.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 6 },
 
-    elevation: 6,
-  },
+      elevation: 6,
+    },
 
-  addButtonText: {
-    fontSize: 32,
-    color: 'white',
-    fontWeight: '400',
-  },
+    addButtonText: {
+      fontSize: 32,
+      color: 'white',
+      fontWeight: '400',
+    },
 
-  button: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 8,
-  },
-})
+    button: {
+      borderWidth: 1,
+      borderRadius: 10,
+      padding: 8,
+    },
+  })
+)

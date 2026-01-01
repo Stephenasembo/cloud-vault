@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
-import { COLORS } from "./index";
 import { useDeviceContext } from "../../context/DeviceContext";
+import { ColorTheme, useThemeContext } from "../../context/ThemeContext";
 
 export default function SignUp() {
   const { networkStatus } = useDeviceContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
   async function signUpUser() {
     if(networkStatus === 'offline') {
@@ -65,7 +68,7 @@ export default function SignUp() {
                 <TextInput
                   style={styles.input}
                   placeholder="johndoe@gmail.com"
-                  placeholderTextColor={COLORS.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   onChangeText={setEmail}
                   keyboardType="email-address"
                 />
@@ -75,7 +78,7 @@ export default function SignUp() {
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your password"
-                  placeholderTextColor={COLORS.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   secureTextEntry
                   onChangeText={setPassword}
                 />
@@ -102,76 +105,78 @@ export default function SignUp() {
   )
 }
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  headerContainer: {
-    marginBottom: 40,
-    alignItems: 'center',
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.primary,
-    marginBottom: 8,
-  },
-  subHeading: {
-    fontSize: 16,
-    color: COLORS.mutedText,
-  },
-  networkInfoContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  networkInfoText: {
-    color: COLORS.mutedText,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  formContainer: {
-    width: '100%',
-  },
-  inputContainer: {
-    marginVertical: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#D6E6F2',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: COLORS.primary,
-  },
-  button: {
-    marginTop: 20,
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-    borderColor: '#D6E6F2',
-    backgroundColor: COLORS.primary,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  primaryButtonPressed: {
-    transform: [{ scale: 0.9 }],
-    shadowOpacity: 0.1,
-    elevation: 2,
-  },
-})
+export const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+    },
+    headerContainer: {
+      marginBottom: 40,
+      alignItems: 'center',
+    },
+    heading: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.primary,
+      marginBottom: 8,
+    },
+    subHeading: {
+      fontSize: 16,
+      color: colors.mutedText,
+    },
+    networkInfoContainer: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    networkInfoText: {
+      color: colors.mutedText,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    formContainer: {
+      width: '100%',
+    },
+    inputContainer: {
+      marginVertical: 16,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.primary,
+      marginBottom: 8,
+    },
+    input: {
+      backgroundColor: 'white',
+      borderWidth: 1,
+      borderColor: '#D6E6F2',
+      borderRadius: 14,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.primary,
+    },
+    button: {
+      marginTop: 20,
+      borderRadius: 20,
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      borderWidth: 1,
+      alignItems: 'center',
+      borderColor: '#D6E6F2',
+      backgroundColor: colors.primary,
+    },
+    buttonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    primaryButtonPressed: {
+      transform: [{ scale: 0.9 }],
+      shadowOpacity: 0.1,
+      elevation: 2,
+    },
+  })
+)

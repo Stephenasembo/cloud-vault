@@ -1,11 +1,16 @@
 import { Link, useRouter } from "expo-router"
 import { View, Text, StyleSheet, ScrollView, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { ColorTheme, useThemeContext } from "../../context/ThemeContext";
 
 export default function Home() {
   const navigation = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => createThemedStyles(colors), [colors]);
+
   const { width, height } = Dimensions.get("window");
   const messages = [
     "Your files. Always secure.",
@@ -66,81 +71,74 @@ export default function Home() {
   )
 }
 
-export const COLORS = {
-  background: "#EEF7FF",
-  primary: "#3A5874",
-  secondary: "#6FAED9",
-  mutedText: "#6B8AA4",
-  border: "#D6E6F2",
-  textSecondary: '#6B7280',
-}
+const createThemedStyles = (colors: ColorTheme) => (
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: colors.background
+    },
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: COLORS.background
-  },
+    headingContainer: {
+      padding: 24,
+    },
 
-  headingContainer: {
-    padding: 24,
-  },
+    headingText: {
+      fontSize: 26,
+      fontWeight: '800',
+      color: colors.primary,
+    },
 
-  headingText: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.primary,
-  },
+    textContainer: {
+      flex: 1,
+      justifyContent: 'flex-end'
+    },
 
-  textContainer: {
-    flex: 1,
-    justifyContent: 'flex-end'
-  },
+    indicator: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.primary,
+      marginHorizontal: 6,
+    },
 
-  indicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.primary,
-    marginHorizontal: 6,
-  },
+    slide: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  slide: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    slideText: {
+      fontSize: 20,
+      fontWeight: "500",
+      color: colors.mutedText,
+      textAlign: "center",
+      paddingHorizontal: 20,
+    },
 
-  slideText: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: COLORS.mutedText,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
+    indicatorContainer: {
+      flexDirection: "row",
+      marginVertical: 32,
+    },
 
-  indicatorContainer: {
-    flexDirection: "row",
-    marginVertical: 32,
-  },
+    linkContainer: {
+      paddingBottom: 32,
+    },
 
-  linkContainer: {
-    paddingBottom: 32,
-  },
+    link: {
+      marginTop: 24,
+      borderRadius: 20,
+      paddingVertical: 16,
+      paddingHorizontal: 100,
+      borderWidth: 2,
+      textAlign: 'center',
+      backgroundColor: colors.primary,
+      borderColor: '#D6E6F2',
+    },
 
-  link: {
-    marginTop: 24,
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 100,
-    borderWidth: 2,
-    textAlign: 'center',
-    backgroundColor: COLORS.primary,
-    borderColor: '#D6E6F2',
-  },
-
-  linkText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
-  }
-})
+    linkText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: '700',
+    }
+  })
+)
