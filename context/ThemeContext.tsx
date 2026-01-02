@@ -12,6 +12,11 @@ export type ColorTheme = {
   cardBackground: string;
   textPrimary: string;
   menuBorder: string;
+  navBar: {
+    background: string;
+    text: string;
+    border: string;
+  }
 }
 
 export const lightPalette = {
@@ -26,6 +31,11 @@ export const lightPalette = {
   title: '#121824',
   cardBackground: '#DCEAF6',
   menuBorder: '#9FBAD3',
+  navBar: {
+    background: '#F7FBFF',
+    text: '#3A5874',
+    border: '#C7DBEE',
+  }
 }
 
 export const darkPalette = {
@@ -40,6 +50,11 @@ export const darkPalette = {
   title: '#fffbf6',
   cardBackground: '#e4eef4',
   menuBorder: "#475569",
+  navBar: {
+    background: '#162238',
+    text: '#93C5FD',
+    border: '#22304A',
+  }
 }
 
 type ThemeData = {

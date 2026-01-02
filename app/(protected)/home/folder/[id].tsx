@@ -34,6 +34,10 @@ export default function FolderScreen() {
     navigation.setOptions({
       headerTitle: folderName || 'Folder',
       headerTitleAlign: 'center',
+      headerTintColor: colors.navBar.text,
+      headerStyle: {
+        backgroundColor: colors.navBar.background,
+      }
     })
   }, [folderName])
 

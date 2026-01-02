@@ -12,7 +12,8 @@ function RootTabNavigation() {
       tabBarActiveTintColor: '#2563EB',
       tabBarInactiveTintColor: '#9CA3AF',
       tabBarStyle: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.navBar.background,
+        borderTopColor: colors.navBar.border,
       }
     }}>
       <Tabs.Screen name="home" options={{
