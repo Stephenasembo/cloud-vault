@@ -1,5 +1,6 @@
 import { View, Text, Switch } from "react-native";
 import { useThemeContext } from "../../../context/ThemeContext";
+import { saveThemePreference } from "../../../storage/preference";
 
 export default function SettingsScreen() {
   const { mode, setUserTheme, colors } = useThemeContext();
@@ -21,8 +22,10 @@ export default function SettingsScreen() {
 
         <Switch
           value={isDark}
-          onValueChange={(value) =>
+          onValueChange={(value) => {
+            saveThemePreference(value? 'dark' : 'light')
             setUserTheme(value ? "dark" : "light")
+          }
           }
         />
       </View>

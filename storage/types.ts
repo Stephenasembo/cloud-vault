@@ -58,4 +58,6 @@ type FileMutation =
   payload: {filePath: string};
 }
 
-export { Folder, User, File, SuccessStorageType, FolderMutation, FileMutation }
+type ThemeMode = 'light' | 'dark' | null;
+
+export { Folder, User, File, SuccessStorageType, FolderMutation, FileMutation, ThemeMode }
