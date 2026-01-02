@@ -7,6 +7,11 @@ export type ColorTheme = {
   mutedText: string;
   border: string;
   textSecondary: string;
+  linkText: string;
+  title: string;
+  cardBackground: string;
+  textPrimary: string;
+  menuBorder: string;
 }
 
 export const lightPalette = {
@@ -15,7 +20,12 @@ export const lightPalette = {
   secondary: "#6FAED9",
   mutedText: "#6B8AA4",
   border: "#D6E6F2",
+  textPrimary: '#243E57',
   textSecondary: "#6B7280",
+  linkText: '#121824',
+  title: '#121824',
+  cardBackground: '#DCEAF6',
+  menuBorder: '#9FBAD3',
 }
 
 export const darkPalette = {
@@ -24,7 +34,12 @@ export const darkPalette = {
   secondary: "#60A5FA",
   mutedText: "#94A3B8",
   border: "#1E293B",
+  textPrimary: '#282c5c',
   textSecondary: "#CBD5E1",
+  linkText: '#fffbf6',
+  title: '#fffbf6',
+  cardBackground: '#e4eef4',
+  menuBorder: "#475569",
 }
 
 type ThemeData = {

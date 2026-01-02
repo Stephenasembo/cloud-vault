@@ -7,7 +7,7 @@ export default function SettingsScreen() {
   const isDark = mode === "dark";
 
   return (
-    <View style={{ padding: 16 }}>
+    <View style={{ backgroundColor: colors.background ,padding: 16, flex: 1 }}>
       <View
         style={{
           flexDirection: "row",

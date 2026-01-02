@@ -106,7 +106,7 @@ const createThemedStyles = (colors: ColorTheme) => (
       fontWeight: "600",
       marginBottom: 24,
       textAlign: 'center',
-      color: colors.primary,
+      color: colors.textPrimary,
     },
 
     input: {
@@ -138,18 +138,20 @@ const createThemedStyles = (colors: ColorTheme) => (
       paddingVertical: 10,
       paddingHorizontal: 18,
       borderRadius: 12,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.background,
+      borderColor: colors.border,
+      borderWidth: 1,
     },
 
     cancelText: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: colors.mutedText,
     },
 
     saveText: {
       fontSize: 15,
-      fontWeight: "600",
-      color: "white",
+      fontWeight: "700",
+      color: colors.primary,
     },
   })
 )

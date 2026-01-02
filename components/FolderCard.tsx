@@ -68,7 +68,7 @@ const createThemedStyles = (colors: ColorTheme) => (
       borderRadius: 14,
       padding: 18,
       marginBottom: 16,
-      backgroundColor: 'white',
+      backgroundColor: colors.cardBackground,
       borderColor: colors.border,
 
       shadowColor: '#000',
@@ -82,7 +82,7 @@ const createThemedStyles = (colors: ColorTheme) => (
     cardText: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.primary,
+      color: colors.textPrimary,
     },
 
     menuButton: {

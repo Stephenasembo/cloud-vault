@@ -79,7 +79,7 @@ const createThemedStyles = (colors: ColorTheme) => (
 
     modalCard: {
       width: '85%',
-      backgroundColor: 'white',
+      backgroundColor: colors.background,
       padding: 20,
       borderRadius: 16,
       elevation: 5,
@@ -90,11 +90,12 @@ const createThemedStyles = (colors: ColorTheme) => (
       fontWeight: '600',
       textAlign: 'center',
       marginBottom: 16,
+      color: colors.primary,
     },
 
     modalDescription: {
       textAlign: 'center',
-      color: '#666',
+      color: colors.textSecondary,
       marginBottom: 20,
     },
 
@@ -109,6 +110,7 @@ const createThemedStyles = (colors: ColorTheme) => (
       borderRadius: 12,
       paddingVertical: 10,
       paddingHorizontal: 16,
+      borderColor: colors.menuBorder,
     },
 
     cancelText: {

@@ -23,7 +23,7 @@ export default function ProfileLink({ text, destination, icon }: ProfileLinkProp
           <View>{icon}</View>
           <Text style={styles.linkText}>{text}</Text>
         </View>
-        <ChevronRight />
+        <ChevronRight color={colors.linkText}/>
       </View>
     </Link>
   )
@@ -33,6 +33,7 @@ const createThemedStyles = (colors: ColorTheme) => (
   StyleSheet.create({
     linkText: {
       fontSize: 16,
+      color: colors.linkText
     },
 
     linkContainer: {

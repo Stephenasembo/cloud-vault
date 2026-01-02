@@ -64,8 +64,9 @@ export default function MenuPopover({
     from={point}
     placement={Placement.BOTTOM}
     onRequestClose={() => setMenuVisible(false)}
+    popoverStyle={styles.popover}
     >
-      <View style={styles.modalContent}>
+      <View>
         <Pressable
         style={styles.modalButton}
         onPress={() => {
@@ -94,8 +95,8 @@ export default function MenuPopover({
 
 const createThemedStyles = (colors: ColorTheme) => (
   StyleSheet.create({
-    modalContent: {
-      backgroundColor: 'white',
+    popover: {
+      backgroundColor: colors.background,
       minWidth: 160,
       elevation: 8,
       paddingVertical: 12,
@@ -115,7 +116,8 @@ const createThemedStyles = (colors: ColorTheme) => (
       fontSize: 16,
       margin: 8,
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      borderColor: colors.menuBorder,
     },
 
     modalButtonText: {

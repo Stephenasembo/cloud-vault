@@ -30,24 +30,24 @@ export default function Profile() {
           <ProfileLink
           text='Terms & Conditions'
           destination='/profile/terms'
-          icon={<FileText/>}
+          icon={<FileText color={colors.linkText}/>}
           />
           <ProfileLink
           text='FAQ & Help'
           destination='/profile/faq'
-          icon={<HelpCircle />}
+          icon={<HelpCircle color={colors.linkText}/>}
           />
           <ProfileLink
           text='Settings'
           destination='/profile/settings'
-          icon={<Settings />}
+          icon={<Settings color={colors.linkText}/>}
           />
           <Pressable
           onPress={() => setModalVisible(true)}
           >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16}}>
               <Text style={{ fontSize: 18, color: 'red', fontWeight: '500' }}>Logout</Text>
-              <LogOut />
+              <LogOut color={colors.linkText}/>
             </View>
           </Pressable>
         </View>
@@ -83,4 +83,5 @@ const createThemedStyles = (colors: ColorTheme) => (
       justifyContent: 'space-evenly',
       paddingHorizontal: 16,
     },
-  }))
+  })
+)
