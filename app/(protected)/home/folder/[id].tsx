@@ -391,7 +391,7 @@ export default function FolderScreen() {
             setMenuVisible(true);
             setPickedFile(pickedFile)
           }}
-          storagePath={item.name}
+          storagePath={item.storagePath}
           />
         )}
         />

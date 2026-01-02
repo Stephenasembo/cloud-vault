@@ -5,6 +5,7 @@ import { FileObject } from '@supabase/storage-js';
 import { deleteFile, shareFile } from "../services/storage";
 import { Placement, Point } from 'react-native-popover-view/dist/Types'
 import { ColorTheme, useThemeContext } from "../context/ThemeContext";
+import { useDeviceContext } from "../context/DeviceContext";
 
 export type MenuType = {
   userId: string;
@@ -33,6 +34,7 @@ export default function MenuPopover({
 }: MenuType) {
 
   const { colors } = useThemeContext();
+  const { networkStatus } = useDeviceContext();
 
   const styles = useMemo(() => createThemedStyles(colors), [colors]);
 
@@ -40,10 +42,15 @@ export default function MenuPopover({
   [coordinates.x, coordinates.y]);
 
   async function handleShare() {
-    setMenuVisible(false)
-    const filePath = `public/${userId}/${folderId}/${storagePath}`;
-    console.log({filePath})
-    const shareLink = await shareFile(filePath);
+    setMenuVisible(false);
+    if(networkStatus === 'offline') {
+      Alert.alert(
+        'Failed to create share link',
+        'Please connect to the internet and try again'
+      )
+      return
+    }
+    const shareLink = await shareFile(storagePath);
     if(!shareLink) {
       Alert.alert('Failed to create share link.');
       return
